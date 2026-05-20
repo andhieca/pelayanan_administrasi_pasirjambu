@@ -16,8 +16,12 @@ Route::get('/', function () {
 // Temporary route to fix live server configuration
 Route::get('/setup', function () {
     try {
-        // Run database migrations to add verification_token column
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        // Directly add the column without relying on migration files being uploaded
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('permohonans', 'verification_token')) {
+            \Illuminate\Support\Facades\Schema::table('permohonans', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->uuid('verification_token')->nullable()->after('status')->unique();
+            });
+        }
         
         // Backfill tokens for old documents that don't have one
         $permohonans = \App\Models\Permohonan::whereNull('verification_token')->get();
