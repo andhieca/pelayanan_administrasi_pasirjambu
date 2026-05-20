@@ -48,7 +48,7 @@
         validatedFiles: {}, // Format: { permohonanId: { fileKey: true } }
 
         openFilePreview(path, key) {
-            this.activeFileSrc = '/storage/' + path;
+            this.activeFileSrc = '{{ asset('storage') }}/' + path;
             this.activeFileKey = key;
             const extension = path.split('.').pop().toLowerCase();
             this.activeFileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension) ? 'image' : 'pdf';

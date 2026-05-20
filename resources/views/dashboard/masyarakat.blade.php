@@ -41,9 +41,9 @@
         isDraftValue: 0,
 
         viewFile(path) {
-            this.previewUrl = '/storage/' + path;
+            this.previewUrl = '{{ asset('storage') }}/' + path;
             const extension = path.split('.').pop().toLowerCase();
-            this.previewType = ['jpg', 'jpeg', 'png', 'gif'].includes(extension) ? 'image' : 'pdf';
+            this.previewType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension) ? 'image' : 'pdf';
             this.showPreviewModal = true;
         },
         viewPrint(url) {
