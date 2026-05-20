@@ -631,7 +631,7 @@
                             </path>
                         </svg>
                     </div>
-                    <span class="font-display font-bold text-lg text-white/90 tracking-tight">Pelayanan Administrasi</span>
+                    <span class="font-display font-bold text-lg text-white/90 tracking-tight">Pelayanan Administrasi Kecamatan Pasirjambu</span>
                 </div>
 
                 <!-- Contact Pills -->
