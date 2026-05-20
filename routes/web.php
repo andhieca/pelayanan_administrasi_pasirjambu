@@ -13,6 +13,15 @@ Route::get('/', function () {
     return view('welcome', compact('articles'));
 });
 
+// Temporary route to fix live server storage links and cache
+Route::get('/setup', function () {
+    \Illuminate\Support\Facades\Artisan::call('storage:link');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    return 'Setup completed! Storage linked and cache cleared. You can now try previewing the files again.';
+});
+
 Route::get('/berita', [\App\Http\Controllers\ArticlePublicController::class, 'index'])->name('public.articles.index');
 
 // Public document verification (accessible without login)
