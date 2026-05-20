@@ -1,0 +1,1 @@
+<img src="{{ asset('logo-kab-bandung.png') }}" {{ $attributes }} alt="Logo Kabupaten Bandung">
