@@ -13,13 +13,32 @@ Route::get('/', function () {
     return view('welcome', compact('articles'));
 });
 
-// Temporary route to fix live server storage links and cache
+// Temporary route to fix live server configuration
 Route::get('/setup', function () {
-    \Illuminate\Support\Facades\Artisan::call('storage:link');
-    \Illuminate\Support\Facades\Artisan::call('config:clear');
-    \Illuminate\Support\Facades\Artisan::call('cache:clear');
-    \Illuminate\Support\Facades\Artisan::call('view:clear');
-    return 'Setup completed! Storage linked and cache cleared. You can now try previewing the files again.';
+    try {
+        // Run database migrations to add verification_token column
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        
+        // Backfill tokens for old documents that don't have one
+        $permohonans = \App\Models\Permohonan::whereNull('verification_token')->get();
+        $count = 0;
+        foreach ($permohonans as $p) {
+            $p->update(['verification_token' => (string) \Illuminate\Support\Str::uuid()]);
+            $count++;
+        }
+        
+        // Link storage
+        \Illuminate\Support\Facades\Artisan::call('storage:link');
+        
+        // Clear caches
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        
+        return 'Setup completed successfully! Database migrated, storage linked, and cache cleared.';
+    } catch (\Exception $e) {
+        return 'Error during setup: ' . $e->getMessage();
+    }
 });
 
 // Robust file serving route (bypasses symlink issues on shared hosting)
