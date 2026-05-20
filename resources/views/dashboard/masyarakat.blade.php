@@ -41,7 +41,7 @@
         isDraftValue: 0,
 
         viewFile(path) {
-            this.previewUrl = '{{ asset('storage') }}/' + path;
+            this.previewUrl = '/berkas/' + path;
             const extension = path.split('.').pop().toLowerCase();
             this.previewType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension) ? 'image' : 'pdf';
             this.showPreviewModal = true;
