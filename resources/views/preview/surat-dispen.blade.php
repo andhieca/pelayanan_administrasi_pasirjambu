@@ -325,7 +325,7 @@
     @if($permohonan->status == 'ditandatangani' || $permohonan->status == 'selesai')
         <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
         <script>
-            QRCode.toCanvas(document.getElementById('qrcode-canvas'), '{{ route('dokumen.verify', $permohonan->verification_token) }}', {
+            QRCode.toCanvas(document.getElementById('qrcode-canvas'), '{{ route('dokumen.verify', $permohonan->verification_token ?? 'belum-diverifikasi') }}', {
                 width: 90,
                 margin: 1
             }, function (error) {
