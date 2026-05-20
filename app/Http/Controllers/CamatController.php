@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Permohonan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class CamatController extends Controller
 {
@@ -74,6 +75,7 @@ class CamatController extends Controller
         } else {
             $permohonan->update([
                 'status' => 'ditandatangani',
+                'verification_token' => Str::uuid()->toString(),
             ]);
             $permohonan->logs()->create([
                 'action' => 'signed_camat',

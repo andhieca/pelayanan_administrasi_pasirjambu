@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MasyarakatController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\CamatController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,6 +14,9 @@ Route::get('/', function () {
 });
 
 Route::get('/berita', [\App\Http\Controllers\ArticlePublicController::class, 'index'])->name('public.articles.index');
+
+// Public document verification (accessible without login)
+Route::get('/verify/{token}', [VerificationController::class, 'verify'])->name('dokumen.verify');
 
 Route::get('/dashboard', function () {
     $role = Auth::user()->role;
