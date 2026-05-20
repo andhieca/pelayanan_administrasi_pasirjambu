@@ -306,7 +306,7 @@
                         x-transition:enter="transition ease-out duration-700"
                         x-transition:enter-start="opacity-0 translate-y-4"
                         x-transition:enter-end="opacity-100 translate-y-0">
-                        Berita & Artikel Desa
+                        Berita & Artikel
                     </h2>
                     <p class="text-slate-500 text-lg leading-relaxed" x-show="shown"
                         x-transition:enter="transition ease-out duration-700 delay-200"
