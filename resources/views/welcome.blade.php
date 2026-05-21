@@ -817,6 +817,16 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor WhatsApp</label>
+                        <input type="tel" name="phone" value="{{ old('phone') }}" required
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
+                            placeholder="Contoh: 081234567890">
+                        @if ($errors->has('phone'))
+                            <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $errors->first('phone') }}</p>
+                        @endif
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kata Sandi</label>
                         <input type="password" name="password" required
                             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
