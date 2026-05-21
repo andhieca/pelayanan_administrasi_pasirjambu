@@ -18,6 +18,7 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'nip' => ['nullable', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^(08|62|\+62)[0-9]{8,13}$/'],
             'email' => [
                 'required',
                 'string',

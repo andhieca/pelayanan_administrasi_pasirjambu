@@ -22,6 +22,13 @@ Route::get('/setup', function () {
                 $table->uuid('verification_token')->nullable()->after('status')->unique();
             });
         }
+
+        // Add phone column to users table
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'phone')) {
+            \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->string('phone', 20)->nullable()->after('email');
+            });
+        }
         
         // Backfill tokens for old documents that don't have one
         $permohonans = \App\Models\Permohonan::whereNull('verification_token')->get();
