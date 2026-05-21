@@ -7,6 +7,22 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
+    @if (session('success'))
+        <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl flex items-start gap-4 shadow-md">
+            <div class="bg-emerald-100 p-2.5 rounded-xl text-emerald-600 shadow-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div>
+                <h4 class="text-sm font-black text-emerald-800 uppercase tracking-widest">Pendaftaran Berhasil!</h4>
+                <p class="text-[11px] text-emerald-600 mt-1 font-bold leading-tight">
+                    {{ session('success') }}
+                </p>
+            </div>
+        </div>
+    @endif
+
     @if ($errors->any())
         <div
             class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl flex items-start gap-4 shadow-md animate-shake">
