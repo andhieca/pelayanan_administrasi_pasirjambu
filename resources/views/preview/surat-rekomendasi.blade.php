@@ -26,7 +26,8 @@
         }
 
         .surat-container {
-            width: 215mm;
+            width: 100%;
+            max-width: 215mm;
             /* F4 Width */
             min-height: 330mm;
             /* F4 Height */
@@ -39,6 +40,29 @@
             /* Set font to Arial */
             font-size: 11pt;
             line-height: 1.5;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        @media screen and (max-width: 640px) {
+            .surat-container {
+                padding: 5mm 10mm;
+            }
+            .kop-text h2 {
+                font-size: 12pt;
+            }
+            .kop-text h1 {
+                font-size: 14pt;
+            }
+            .kop-text p {
+                font-size: 7pt;
+            }
+            .kop-logo-aside, .kop-spacer, .kop-logo {
+                width: 60px;
+            }
+            table td {
+                word-break: break-word;
+            }
         }
 
         table {
@@ -126,31 +150,31 @@
     @if(Route::currentRouteName() !== 'camat.preview')
         <!-- Action Bar -->
         <div
-            class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center shadow-sm no-print print:hidden z-50 font-sans w-full">
-            <h1 class="font-bold text-gray-700 items-center flex gap-2">
-                <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs uppercase">Preview</span>
+            class="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm no-print print:hidden z-50 font-sans gap-3 sm:gap-0 w-full">
+            <h1 class="font-bold text-gray-700 items-center flex flex-wrap gap-2 text-sm sm:text-base">
+                <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs uppercase whitespace-nowrap">Preview</span>
                 Surat Rekomendasi Bantuan
             </h1>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                 <button onclick="window.close()"
-                    class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    class="flex-1 sm:flex-none justify-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
                     Tutup
                 </button>
                 <button onclick="window.print()"
-                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="flex-1 sm:flex-none justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
                         </path>
                     </svg>
-                    Cetak / Simpan PDF
+                    <span class="whitespace-nowrap">Cetak / Simpan PDF</span>
                 </button>
             </div>
         </div>
     @endif
 
     <div
-        class="surat-container relative shrink-0 {{ Route::currentRouteName() !== 'camat.preview' ? 'mt-20' : '' }} print:mt-0">
+        class="surat-container relative shrink-0 {{ Route::currentRouteName() !== 'camat.preview' ? 'mt-28 sm:mt-20' : '' }} print:mt-0">
         <!-- Kop Surat -->
         <div class="kop-surat-container">
             <div class="kop-logo-aside">
