@@ -116,14 +116,14 @@
                                     <div class="p-6 rounded-2xl border transition-all duration-300
                                         {{ $index === 0 ? 'bg-white border-bedas-100 shadow-lg shadow-bedas-100/50 scale-[1.02]' : 'bg-slate-50 border-slate-100 opacity-75 grayscale-[0.5] hover:grayscale-0' }}">
 
-                                        <div class="flex justify-between items-start mb-4">
+                                        <div class="flex flex-col sm:flex-row sm:justify-between items-start mb-4 gap-2 sm:gap-0">
                                             <div>
-                                                <div class="flex items-center gap-3 mb-1">
+                                                <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
                                                     <span class="font-mono text-sm font-bold text-slate-400">#{{ $p->no_antrean }}</span>
                                                     @if($index === 0)
-                                                        <span class="px-2 py-0.5 bg-bedas-100 text-bedas-700 text-[10px] font-bold uppercase tracking-wide rounded-full">Giliran Proses</span>
+                                                        <span class="px-2 py-0.5 bg-bedas-100 text-bedas-700 text-[10px] font-bold uppercase tracking-wide rounded-full whitespace-nowrap">Giliran Proses</span>
                                                     @else
-                                                        <span class="px-2 py-0.5 bg-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wide rounded-full">Menunggu</span>
+                                                        <span class="px-2 py-0.5 bg-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wide rounded-full whitespace-nowrap">Menunggu</span>
                                                     @endif
                                                 </div>
                                                 <h4 class="text-lg font-bold text-slate-800">{{ $p->jenis_layanan }}</h4>
@@ -132,24 +132,24 @@
                                             <span class="text-xs text-slate-400 font-mono">{{ $p->created_at->format('H:i') }}</span>
                                         </div>
 
-                                        <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-4">
+                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-t border-slate-100 pt-4 mt-4 gap-4 sm:gap-0">
                                             <button @click="showDetailModal = true; selectedPermohonan = {{ $p }}" class="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                <svg class="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                 Lihat Detail & Berkas
                                             </button>
 
-                                            <div class="flex gap-3">
+                                            <div class="flex w-full sm:w-auto gap-2 sm:gap-3">
                                                 @if($index === 0)
                                                     <button @click="showModal = true; selectedId = {{ $p->id }}; actionType = 'reject'" 
-                                                        class="px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition-colors">
+                                                        class="flex-1 sm:flex-none justify-center px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition-colors">
                                                         Tolak
                                                     </button>
                                                     <button @click="showModal = true; selectedId = {{ $p->id }}; actionType = 'approve'"
-                                                        class="px-5 py-2 bg-bedas-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-bedas-200 hover:bg-bedas-700 transition-all transform hover:-translate-y-0.5">
+                                                        class="flex-1 sm:flex-none justify-center px-5 py-2 bg-bedas-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-bedas-200 hover:bg-bedas-700 transition-all transform hover:-translate-y-0.5">
                                                         Validasi
                                                     </button>
                                                 @else
-                                                    <span class="px-4 py-2 text-slate-400 text-sm font-medium cursor-not-allowed flex items-center gap-1">
+                                                    <span class="flex-1 sm:flex-none justify-center px-4 py-2 text-slate-400 text-sm font-medium cursor-not-allowed flex items-center gap-1 bg-slate-50 sm:bg-transparent rounded-lg sm:rounded-none">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                                         Terkunci
                                                     </span>
