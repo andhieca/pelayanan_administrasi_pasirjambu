@@ -109,6 +109,7 @@ Route::middleware(['auth', 'role:camat'])->group(function () {
     Route::get('/camat/dashboard', [CamatController::class, 'index'])->name('camat.dashboard');
     Route::post('/camat/approve/{id}', [CamatController::class, 'approve'])->name('camat.approve');
     Route::get('/camat/preview/{id}', [CamatController::class, 'preview'])->name('camat.preview');
+    Route::get('/camat/report/print', [CamatController::class, 'printReport'])->name('camat.report.print');
 });
 
 Route::middleware('auth')->group(function () {

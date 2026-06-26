@@ -101,4 +101,21 @@ class CamatController extends Controller
 
         return redirect()->back()->with('error', 'Preview belum tersedia untuk layanan ini.');
     }
+
+    public function printReport(Request $request)
+    {
+        // Fetch historical data (signed, finished, rejected)
+        $history = Permohonan::whereIn('status', ['ditandatangani', 'selesai', 'ditolak'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // Calculate statistics for the report
+        $total = $history->count();
+        $disetujui = $history->whereIn('status', ['ditandatangani', 'selesai'])->count();
+        $ditolak = $history->where('status', 'ditolak')->count();
+
+        $camat = Auth::user();
+
+        return view('dashboard.camat-report', compact('history', 'total', 'disetujui', 'ditolak', 'camat'));
+    }
 }
