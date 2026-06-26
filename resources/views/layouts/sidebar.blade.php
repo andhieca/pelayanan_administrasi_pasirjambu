@@ -33,6 +33,18 @@
                         <span class="ms-3">Kelola Berita</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('petugas.users.index') }}"
+                        class="flex items-center p-2 text-gray-900 rounded-lg {{ request()->routeIs('petugas.users.*') ? 'bg-bedas-50 text-bedas-600' : 'hover:bg-gray-100 group' }}">
+                        <svg class="w-5 h-5 transition duration-75 group-hover:text-bedas-600" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                            <path
+                                d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.988 2.988 0 0 1-.505 1.697H19a1 1 0 0 0 1-1v-5.122a3.447 3.447 0 0 0-3.445-3.445H15Z" />
+                            <path d="M7 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0 2a7 7 0 0 0-7 7v1h14v-1a7 7 0 0 0-7-7H7Z" />
+                        </svg>
+                        <span class="ms-3">Kelola Pengguna</span>
+                    </a>
+                </li>
             @endif
 
             <li class="pt-4 pb-2">

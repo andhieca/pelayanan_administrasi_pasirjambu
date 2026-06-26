@@ -5,6 +5,7 @@ use App\Http\Controllers\MasyarakatController;
 use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\CamatController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,6 +28,13 @@ Route::get('/setup', function () {
         if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'phone')) {
             \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
                 $table->string('phone', 20)->nullable()->after('email');
+            });
+        }
+
+        // Add is_active column to users table
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active')) {
+            \Illuminate\Support\Facades\Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->boolean('is_active')->default(true)->after('role');
             });
         }
         
@@ -91,6 +99,10 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::post('/petugas/validate/{id}', [PetugasController::class, 'validateBerkas'])->name('petugas.validate');
     Route::post('/petugas/nomor-surat/{id}', [PetugasController::class, 'nomorSurat'])->name('petugas.nomorSurat');
     Route::resource('/petugas/articles', \App\Http\Controllers\ArticleController::class)->names('petugas.articles');
+    Route::get('/petugas/users', [UserManagementController::class, 'index'])->name('petugas.users.index');
+    Route::post('/petugas/users', [UserManagementController::class, 'store'])->name('petugas.users.store');
+    Route::put('/petugas/users/{id}', [UserManagementController::class, 'update'])->name('petugas.users.update');
+    Route::delete('/petugas/users/{id}', [UserManagementController::class, 'destroy'])->name('petugas.users.destroy');
 });
 
 Route::middleware(['auth', 'role:camat'])->group(function () {

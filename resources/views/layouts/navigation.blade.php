@@ -87,6 +87,10 @@
                     :active="request()->routeIs('petugas.articles.*')">
                     {{ __('Kelola Berita') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('petugas.users.index')"
+                    :active="request()->routeIs('petugas.users.*')">
+                    {{ __('Kelola Pengguna') }}
+                </x-responsive-nav-link>
             @endif
         </div>
 
