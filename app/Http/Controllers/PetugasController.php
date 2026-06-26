@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permohonan;
+use App\Services\FonnteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -87,6 +88,42 @@ class PetugasController extends Controller
             'actor_id' => Auth::id(),
         ]);
 
+        // Kirim notifikasi WhatsApp ke masyarakat
+        $this->sendWhatsAppNotification($permohonan);
+
         return redirect()->back()->with('success', 'Nomor Surat berhasil ditambahkan: ' . $request->nomor_surat . '. Berkas siap diterima masyarakat.');
+    }
+
+    /**
+     * Send WhatsApp notification to masyarakat via Fonnte.
+     */
+    protected function sendWhatsAppNotification(Permohonan $permohonan): void
+    {
+        // Get phone number: prioritize metadata.whatsapp, fallback to user.phone
+        $phone = $permohonan->metadata['whatsapp'] ?? null;
+
+        if (empty($phone)) {
+            $permohonan->loadMissing('user');
+            $phone = $permohonan->user->phone ?? null;
+        }
+
+        if (empty($phone)) {
+            return; // No phone number available, skip notification
+        }
+
+        $nama = $permohonan->user->name ?? 'Bapak/Ibu';
+        $jenisLayanan = $permohonan->jenis_layanan;
+        $nomorSurat = $permohonan->nomor_surat;
+
+        $message = "Assalamu'alaikum {$nama},\n\n"
+            . "Surat *{$jenisLayanan}* Anda telah selesai diproses.\n\n"
+            . "📄 Nomor Surat: *{$nomorSurat}*\n"
+            . "📋 Jenis: {$jenisLayanan}\n\n"
+            . "Surat Anda telah selesai, untuk mendownloadnya silakan login ke akun Anda masing-masing di website Pelayanan Administrasi Kecamatan Pasirjambu.\n\n"
+            . "Terima kasih.\n"
+            . "— Pelayanan Administrasi Kecamatan Pasirjambu";
+
+        $fonnte = new FonnteService();
+        $fonnte->sendMessage($phone, $message);
     }
 }
