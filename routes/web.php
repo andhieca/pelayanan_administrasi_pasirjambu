@@ -60,6 +60,37 @@ Route::get('/setup', function () {
     }
 });
 
+// Route untuk meng-copy semua gambar dari storage ke folder public
+// Jalankan sekali saja dengan mengakses: https://domain-anda.com/sync-images
+Route::get('/sync-images', function () {
+    $sourceDir = storage_path('app/public/articles');
+    $destDir = public_path('storage/articles');
+
+    if (!is_dir($sourceDir)) {
+        return 'Folder sumber tidak ditemukan: ' . $sourceDir;
+    }
+
+    // Buat folder tujuan jika belum ada
+    if (!is_dir($destDir)) {
+        mkdir($destDir, 0755, true);
+    }
+
+    $files = scandir($sourceDir);
+    $files = array_diff($files, ['.', '..']);
+    $copied = 0;
+
+    foreach ($files as $file) {
+        $source = $sourceDir . '/' . $file;
+        $dest = $destDir . '/' . $file;
+        if (is_file($source) && !file_exists($dest)) {
+            copy($source, $dest);
+            $copied++;
+        }
+    }
+
+    return "Sinkronisasi selesai! {$copied} gambar berhasil dicopy dari " . count($files) . " total file.";
+});
+
 // TEMPORARY: Halaman diagnostik untuk debug gambar - HAPUS setelah selesai!
 Route::get('/debug-images', function () {
     $articles = \App\Models\Article::select('id', 'title', 'image')->get();

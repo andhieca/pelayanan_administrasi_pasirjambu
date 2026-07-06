@@ -6,9 +6,45 @@ use Illuminate\Http\Request;
 
 use App\Models\Article;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ArticleController extends Controller
 {
+    /**
+     * Copy gambar dari storage ke folder public agar bisa diakses browser
+     * (mengatasi masalah symlink di shared hosting seperti Hostinger)
+     */
+    private function syncImageToPublic(string $imagePath): void
+    {
+        $source = storage_path('app/public/' . $imagePath);
+        $destination = public_path('storage/' . $imagePath);
+
+        // Buat folder tujuan jika belum ada
+        $destDir = dirname($destination);
+        if (!File::isDirectory($destDir)) {
+            File::makeDirectory($destDir, 0755, true);
+        }
+
+        // Copy file
+        if (File::exists($source)) {
+            File::copy($source, $destination);
+        }
+    }
+
+    /**
+     * Hapus gambar dari kedua lokasi (storage dan public)
+     */
+    private function deleteImage(string $imagePath): void
+    {
+        Storage::disk('public')->delete($imagePath);
+
+        $publicPath = public_path('storage/' . $imagePath);
+        if (File::exists($publicPath)) {
+            File::delete($publicPath);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -41,6 +77,8 @@ class ArticleController extends Controller
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('articles', 'public');
+            // Copy ke folder public agar bisa diakses tanpa symlink
+            $this->syncImageToPublic($imagePath);
         }
 
         Article::create([
@@ -86,11 +124,13 @@ class ArticleController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+            // Hapus gambar lama dari kedua lokasi
             if ($article->image) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($article->image);
+                $this->deleteImage($article->image);
             }
             $data['image'] = $request->file('image')->store('articles', 'public');
+            // Copy ke folder public agar bisa diakses tanpa symlink
+            $this->syncImageToPublic($data['image']);
         }
 
         $article->update($data);
@@ -106,7 +146,7 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
 
         if ($article->image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($article->image);
+            $this->deleteImage($article->image);
         }
 
         $article->delete();
@@ -114,3 +154,4 @@ class ArticleController extends Controller
         return redirect()->route('petugas.articles.index')->with('success', 'Artikel berhasil dihapus!');
     }
 }
+
