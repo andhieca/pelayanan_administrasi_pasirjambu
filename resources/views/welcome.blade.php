@@ -337,7 +337,7 @@
                         x-transition:enter-end="opacity-100 translate-y-0"
                         class="group bg-white rounded-3xl overflow-hidden border border-slate-100 hover:shadow-2xl transition-all duration-500">
                         <div class="relative aspect-[16/10] overflow-hidden">
-                            <img src="{{ $article->image ? (filter_var($article->image, FILTER_VALIDATE_URL) ? $article->image : asset('storage/' . $article->image)) : 'https://images.unsplash.com/photo-1541872703-74c5e443d1fe?auto=format&fit=crop&q=80&w=800' }}"
+                            <img src="{{ $article->image_url ?? 'https://images.unsplash.com/photo-1541872703-74c5e443d1fe?auto=format&fit=crop&q=80&w=800' }}"
                                 alt="{{ $article->title }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                             <div class="absolute top-4 left-4">
@@ -366,7 +366,7 @@
                                                                             content: {{ json_encode($article->content) }},
                                                                             date: '{{ $article->created_at->format('d M Y') }}',
                                                                             category: '{{ $article->category ?? 'Berita' }}',
-                                                                            image: '{{ $article->image ? (filter_var($article->image, FILTER_VALIDATE_URL) ? $article->image : asset('storage/' . $article->image)) : 'https://images.unsplash.com/photo-1541872703-74c5e443d1fe?auto=format&fit=crop&q=80&w=800' }}'
+                                                                            image: '{{ $article->image_url ?? 'https://images.unsplash.com/photo-1541872703-74c5e443d1fe?auto=format&fit=crop&q=80&w=800' }}'
                                                                         })"
                                 class="inline-flex items-center gap-2 text-bedas-600 font-bold group/link focus:outline-none">
                                 Baca Selengkapnya

@@ -30,8 +30,8 @@ class Article extends Model
             return $this->image;
         }
 
-        // Generate URL using asset() which respects the current request URL
-        return asset('storage/' . $this->image);
+        // Use the robust berkas.serve route to bypass symlink issues on shared hosting
+        return route('berkas.serve', ['path' => $this->image]);
     }
 
     public function user()
