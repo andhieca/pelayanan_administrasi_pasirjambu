@@ -30,8 +30,8 @@ class Article extends Model
             return $this->image;
         }
 
-        // Use asset() pointing directly to the uploads folder, bypassing symlinks entirely
-        return asset('uploads/' . $this->image);
+        // Gunakan rute berkas.serve yang lebih kebal terhadap masalah cache config di shared hosting
+        return route('berkas.serve', ['path' => $this->image]);
     }
 
     public function user()
