@@ -60,37 +60,6 @@ Route::get('/setup', function () {
     }
 });
 
-// Route untuk meng-copy semua gambar dari storage ke folder public
-// Jalankan sekali saja dengan mengakses: https://domain-anda.com/sync-images
-Route::get('/sync-images', function () {
-    $sourceDir = storage_path('app/public/articles');
-    $destDir = public_path('storage/articles');
-
-    if (!is_dir($sourceDir)) {
-        return 'Folder sumber tidak ditemukan: ' . $sourceDir;
-    }
-
-    // Buat folder tujuan jika belum ada
-    if (!is_dir($destDir)) {
-        mkdir($destDir, 0755, true);
-    }
-
-    $files = scandir($sourceDir);
-    $files = array_diff($files, ['.', '..']);
-    $copied = 0;
-
-    foreach ($files as $file) {
-        $source = $sourceDir . '/' . $file;
-        $dest = $destDir . '/' . $file;
-        if (is_file($source) && !file_exists($dest)) {
-            copy($source, $dest);
-            $copied++;
-        }
-    }
-
-    return "Sinkronisasi selesai! {$copied} gambar berhasil dicopy dari " . count($files) . " total file.";
-});
-
 // TEMPORARY: Halaman diagnostik untuk debug gambar - HAPUS setelah selesai!
 Route::get('/debug-images', function () {
     $articles = \App\Models\Article::select('id', 'title', 'image')->get();
@@ -160,11 +129,22 @@ Route::get('/berkas/{path}', function($path) {
 })->where('path', '.*')->name('berkas.serve');
 
 // Fallback: jika symlink public/storage tidak ada, serve file dari storage/app/public/
-// Route ini hanya terpanggil jika file TIDAK ditemukan secara statis oleh Apache
+// Route ini otomatis melakukan sinkronisasi gambar (copy) ke public saat pertama kali diakses
 Route::get('/storage/{path}', function($path) {
     $path = str_replace(['..', '\\'], '', $path);
     $fullPath = storage_path('app/public/' . $path);
+    
     if (file_exists($fullPath)) {
+        // Auto-sync: Copy ke public folder agar akses berikutnya ditangani langsung oleh server (lebih cepat)
+        $publicPath = public_path('storage/' . $path);
+        $publicDir = dirname($publicPath);
+        if (!is_dir($publicDir)) {
+            @mkdir($publicDir, 0755, true);
+        }
+        if (!file_exists($publicPath)) {
+            @copy($fullPath, $publicPath);
+        }
+        
         return response()->file($fullPath);
     }
     abort(404);
