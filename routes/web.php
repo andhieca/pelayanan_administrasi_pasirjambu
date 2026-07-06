@@ -128,6 +128,17 @@ Route::get('/berkas/{path}', function($path) {
     abort(404);
 })->where('path', '.*')->name('berkas.serve');
 
+// Fallback: jika symlink public/storage tidak ada, serve file dari storage/app/public/
+// Route ini hanya terpanggil jika file TIDAK ditemukan secara statis oleh Apache
+Route::get('/storage/{path}', function($path) {
+    $path = str_replace(['..', '\\'], '', $path);
+    $fullPath = storage_path('app/public/' . $path);
+    if (file_exists($fullPath)) {
+        return response()->file($fullPath);
+    }
+    abort(404);
+})->where('path', '.*');
+
 Route::get('/berita', [\App\Http\Controllers\ArticlePublicController::class, 'index'])->name('public.articles.index');
 
 // Public document verification (accessible without login)
