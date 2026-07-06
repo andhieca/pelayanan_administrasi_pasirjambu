@@ -60,6 +60,54 @@ Route::get('/setup', function () {
     }
 });
 
+// TEMPORARY: Halaman diagnostik untuk debug gambar - HAPUS setelah selesai!
+Route::get('/debug-images', function () {
+    $articles = \App\Models\Article::select('id', 'title', 'image')->get();
+    $output = '<h2>🔍 Diagnostik Gambar Artikel</h2>';
+    $output .= '<p><strong>storage_path("app/public"):</strong> ' . storage_path('app/public') . '</p>';
+    $output .= '<p><strong>public_path():</strong> ' . public_path() . '</p>';
+    $output .= '<p><strong>base_path():</strong> ' . base_path() . '</p>';
+    $output .= '<p><strong>Folder storage/app/public ada?</strong> ' . (is_dir(storage_path('app/public')) ? '✅ YA' : '❌ TIDAK') . '</p>';
+    $output .= '<p><strong>Folder storage/app/public/articles ada?</strong> ' . (is_dir(storage_path('app/public/articles')) ? '✅ YA' : '❌ TIDAK') . '</p>';
+
+    if (is_dir(storage_path('app/public/articles'))) {
+        $files = scandir(storage_path('app/public/articles'));
+        $files = array_diff($files, ['.', '..']);
+        $output .= '<p><strong>File di storage/app/public/articles/:</strong> ' . (count($files) > 0 ? implode(', ', $files) : '(kosong)') . '</p>';
+    }
+
+    $output .= '<p><strong>Folder public/uploads/articles ada?</strong> ' . (is_dir(public_path('uploads/articles')) ? '✅ YA' : '❌ TIDAK') . '</p>';
+
+    if (is_dir(public_path('uploads/articles'))) {
+        $files = scandir(public_path('uploads/articles'));
+        $files = array_diff($files, ['.', '..']);
+        $output .= '<p><strong>File di public/uploads/articles/:</strong> ' . (count($files) > 0 ? implode(', ', $files) : '(kosong)') . '</p>';
+    }
+
+    $output .= '<hr><h3>Data Artikel:</h3>';
+    foreach ($articles as $article) {
+        $output .= '<div style="border:1px solid #ccc; padding:10px; margin:10px 0; border-radius:8px;">';
+        $output .= '<p><strong>ID:</strong> ' . $article->id . ' | <strong>Judul:</strong> ' . e($article->title) . '</p>';
+        $output .= '<p><strong>Kolom image di DB:</strong> <code>' . e($article->image ?? '(NULL)') . '</code></p>';
+
+        if ($article->image) {
+            $locations = [
+                'storage_path("app/public/' . $article->image . '")' => storage_path('app/public/' . $article->image),
+                'public_path("uploads/' . $article->image . '")' => public_path('uploads/' . $article->image),
+                'public_path("storage/' . $article->image . '")' => public_path('storage/' . $article->image),
+            ];
+            foreach ($locations as $label => $fullPath) {
+                $exists = file_exists($fullPath);
+                $output .= '<p>' . ($exists ? '✅' : '❌') . ' ' . e($label) . ' → <code>' . e($fullPath) . '</code></p>';
+            }
+            $output .= '<p><strong>image_url accessor:</strong> <code>' . e($article->image_url) . '</code></p>';
+            $output .= '<p><strong>Test gambar:</strong> <img src="' . e($article->image_url) . '" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:8px;" onerror="this.alt=\'❌ GAGAL LOAD\'"></p>';
+        }
+        $output .= '</div>';
+    }
+    return $output;
+});
+
 // Robust file serving route (bypasses symlink issues on shared hosting)
 Route::get('/berkas/{path}', function($path) {
     $path = str_replace(['..', '\\'], '', $path); // Prevent directory traversal
