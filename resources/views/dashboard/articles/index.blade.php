@@ -48,8 +48,8 @@
                                 <tr class="hover:bg-slate-50 transition-colors group">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-4">
-                                            @if($article->image)
-                                                <img src="{{ filter_var($article->image, FILTER_VALIDATE_URL) ? $article->image : asset('storage/' . $article->image) }}"
+                                            @if($article->image_url)
+                                                <img src="{{ $article->image_url }}"
                                                     class="w-12 h-12 rounded-xl object-cover shadow-sm">
                                             @else
                                                 <div
