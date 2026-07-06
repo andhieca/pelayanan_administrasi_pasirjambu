@@ -30,8 +30,8 @@ class Article extends Model
             return $this->image;
         }
 
-        // Use Storage::url() for reliable URL generation from the public disk
-        return Storage::disk('public')->url($this->image);
+        // Generate URL using asset() which respects the current request URL
+        return asset('storage/' . $this->image);
     }
 
     public function user()
