@@ -63,11 +63,21 @@ Route::get('/setup', function () {
 // Robust file serving route (bypasses symlink issues on shared hosting)
 Route::get('/berkas/{path}', function($path) {
     $path = str_replace(['..', '\\'], '', $path); // Prevent directory traversal
-    $fullPath = storage_path('app/public/' . $path);
-    if (!file_exists($fullPath)) {
-        abort(404);
+
+    // Cek di beberapa kemungkinan lokasi penyimpanan
+    $locations = [
+        storage_path('app/public/' . $path),
+        public_path('uploads/' . $path),
+        public_path('storage/' . $path),
+    ];
+
+    foreach ($locations as $fullPath) {
+        if (file_exists($fullPath)) {
+            return response()->file($fullPath);
+        }
     }
-    return response()->file($fullPath);
+
+    abort(404);
 })->where('path', '.*')->name('berkas.serve');
 
 Route::get('/berita', [\App\Http\Controllers\ArticlePublicController::class, 'index'])->name('public.articles.index');
