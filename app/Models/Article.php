@@ -30,8 +30,8 @@ class Article extends Model
             return $this->image;
         }
 
-        // Use the robust berkas.serve route to bypass symlink issues on shared hosting
-        return route('berkas.serve', ['path' => $this->image]);
+        // Use asset() pointing directly to the uploads folder, bypassing symlinks entirely
+        return asset('uploads/' . $this->image);
     }
 
     public function user()
