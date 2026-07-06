@@ -132,21 +132,30 @@ Route::get('/berkas/{path}', function($path) {
 // Route ini otomatis melakukan sinkronisasi gambar (copy) ke public saat pertama kali diakses
 Route::get('/storage/{path}', function($path) {
     $path = str_replace(['..', '\\'], '', $path);
-    $fullPath = storage_path('app/public/' . $path);
     
-    if (file_exists($fullPath)) {
-        // Auto-sync: Copy ke public folder agar akses berikutnya ditangani langsung oleh server (lebih cepat)
-        $publicPath = public_path('storage/' . $path);
-        $publicDir = dirname($publicPath);
-        if (!is_dir($publicDir)) {
-            @mkdir($publicDir, 0755, true);
+    $possibleLocations = [
+        storage_path('app/public/' . $path),
+        public_path('uploads/' . $path),
+        // Kita tidak perlu mengecek public/storage/ lagi karena kalau ada di situ, 
+        // Apache sudah langsung melayaninya (tidak masuk ke Laravel)
+    ];
+    
+    foreach ($possibleLocations as $sourcePath) {
+        if (file_exists($sourcePath) && is_file($sourcePath)) {
+            // Auto-sync: Copy ke public folder agar akses berikutnya ditangani langsung oleh server
+            $publicPath = public_path('storage/' . $path);
+            $publicDir = dirname($publicPath);
+            if (!is_dir($publicDir)) {
+                @mkdir($publicDir, 0755, true);
+            }
+            if (!file_exists($publicPath)) {
+                @copy($sourcePath, $publicPath);
+            }
+            
+            return response()->file($sourcePath);
         }
-        if (!file_exists($publicPath)) {
-            @copy($fullPath, $publicPath);
-        }
-        
-        return response()->file($fullPath);
     }
+    
     abort(404);
 })->where('path', '.*');
 
