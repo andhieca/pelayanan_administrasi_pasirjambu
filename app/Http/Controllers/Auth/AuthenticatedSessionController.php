@@ -13,10 +13,11 @@ class AuthenticatedSessionController extends Controller
 {
     /**
      * Display the login view.
+     * Redirect to welcome page to open login modal.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.login');
+        return redirect('/?auth=login');
     }
 
     /**

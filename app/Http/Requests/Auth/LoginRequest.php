@@ -12,6 +12,11 @@ use Illuminate\Validation\ValidationException;
 class LoginRequest extends FormRequest
 {
     /**
+     * The URI that users should be redirected to if validation fails.
+     */
+    protected $redirect = '/';
+
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -46,7 +51,7 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
-            ]);
+            ])->redirectTo('/');
         }
 
         RateLimiter::clear($this->throttleKey());
@@ -72,7 +77,7 @@ class LoginRequest extends FormRequest
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
-        ]);
+        ])->redirectTo('/');
     }
 
     /**

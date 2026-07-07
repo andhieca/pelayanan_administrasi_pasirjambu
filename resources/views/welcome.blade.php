@@ -49,14 +49,19 @@
 </head>
 
 <body class="antialiased bg-slate-50 text-slate-600 font-sans selection:bg-bedas-500 selection:text-white" x-data="{ 
-        showLogin: {{ ($errors->has('email') && !old('name')) || $errors->has('password') ? 'true' : 'false' }}, 
-        showRegister: {{ $errors->has('name') || ($errors->has('email') && old('name')) || $errors->has('password_confirmation') ? 'true' : 'false' }},
+        showLogin: {{ ($errors->has('email') && !old('name')) || $errors->has('password') || session('success') ? 'true' : 'false' }} || new URLSearchParams(window.location.search).get('auth') === 'login', 
+        showRegister: {{ $errors->has('name') || ($errors->has('email') && old('name')) || $errors->has('password_confirmation') ? 'true' : 'false' }} || new URLSearchParams(window.location.search).get('auth') === 'register',
         mobileMenuOpen: false,
         toggleAuth() {
             this.showLogin = !this.showLogin;
             this.showRegister = !this.showRegister;
         }
-      }">
+      }" x-init="
+        // Clean URL after reading query params
+        if (new URLSearchParams(window.location.search).get('auth')) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+      ">
 
     <!-- Navbar -->
     <nav x-data="{ scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)"
@@ -699,6 +704,21 @@
                     <p class="text-slate-500 mt-2 text-sm">Silakan masuk ke akun Anda untuk melanjutkan</p>
                 </div>
 
+                @if (session('success'))
+                    <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl flex items-start gap-4 shadow-md">
+                        <div class="bg-emerald-100 p-2.5 rounded-xl text-emerald-600 shadow-sm">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-black text-emerald-800 uppercase tracking-widest">Berhasil!</h4>
+                            <p class="text-[11px] text-emerald-600 mt-1 font-bold leading-tight">
+                                {{ session('success') }}
+                            </p>
+                        </div>
+                    </div>
+                @endif
                 @if ($errors->has('email') || $errors->has('password'))
                     <div
                         class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl flex items-start gap-4 shadow-md animate-shake">

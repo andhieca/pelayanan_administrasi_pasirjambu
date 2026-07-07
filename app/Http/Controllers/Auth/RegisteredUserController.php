@@ -16,10 +16,11 @@ class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
+     * Redirect to welcome page to open register modal.
      */
-    public function create(): View
+    public function create(): RedirectResponse
     {
-        return view('auth.register');
+        return redirect('/?auth=register');
     }
 
     /**
@@ -29,12 +30,18 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        if ($validator->fails()) {
+            return redirect('/')
+                ->withErrors($validator)
+                ->withInput();
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -45,6 +52,6 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk dengan email dan kata sandi Anda.');
+        return redirect('/')->with('success', 'Akun berhasil dibuat! Silakan masuk dengan email dan kata sandi Anda.');
     }
 }
