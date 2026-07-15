@@ -46,10 +46,17 @@
         },
 
         isDetailRejected(label) {
-            if (!this.selectedPermohonan || !this.selectedPermohonan.invalid_items) return false;
-            const items = this.selectedPermohonan.invalid_items;
-            if (Array.isArray(items)) return items.includes(label);
-            return Object.values(items).includes(label);
+            if (!this.selectedPermohonan) return false;
+            // If status is 'ditolak' but no specific invalid_items, highlight ALL sections
+            if (this.selectedPermohonan.status === 'ditolak') {
+                const items = this.selectedPermohonan.invalid_items;
+                if (!items || (Array.isArray(items) && items.length === 0) || (typeof items === 'object' && Object.keys(items).length === 0)) {
+                    return true; // Highlight everything when no specific items listed
+                }
+                if (Array.isArray(items)) return items.includes(label);
+                return Object.values(items).includes(label);
+            }
+            return false;
         },
 
         viewFile(path) {
@@ -307,6 +314,29 @@
                 this.existingFiles = item.metadata.files || {};
             }
             this.rejectedItems = item.invalid_items || [];
+            // If ditolak but no specific invalid_items, highlight all sections for this service
+            if (item.status === 'ditolak' && (!item.invalid_items || (Array.isArray(item.invalid_items) && item.invalid_items.length === 0) || (typeof item.invalid_items === 'object' && Object.keys(item.invalid_items).length === 0))) {
+                const allItems = [];
+                if (item.jenis_layanan === 'Dispen Nikah') {
+                    allItems.push('Data Calon Suami', 'Data Calon Istri', 'Rencana Pernikahan');
+                    if (item.metadata && item.metadata.files) {
+                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
+                    }
+                } else if (item.jenis_layanan === 'Izin Keramaian') {
+                    allItems.push('Data Pemohon', 'Maksud Keramaian');
+                    if (item.metadata && item.metadata.files) {
+                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
+                    }
+                } else if (item.jenis_layanan === 'Rekomendasi Bantuan') {
+                    allItems.push('Data Rekomendasi Bantuan');
+                    if (item.metadata && item.metadata.files) {
+                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
+                    }
+                } else {
+                    allItems.push('Berkas MAIN FILE');
+                }
+                this.rejectedItems = allItems;
+            }
         }
     }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -1174,6 +1204,13 @@
                                             </div>
                                         </template>
 
+                                        <template x-if="!selectedPermohonan.invalid_items || Object.values(selectedPermohonan.invalid_items || {}).length === 0">
+                                            <div class="pl-11">
+                                                <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">⚠️ Periksa Semua Bagian</p>
+                                                <p class="text-xs text-red-600">Semua bagian yang ditandai merah di bawah perlu diperiksa dan diperbaiki.</p>
+                                            </div>
+                                        </template>
+
                                         <template x-if="selectedPermohonan.keterangan">
                                             <div class="pl-11 pt-2 border-t border-red-100 mt-2">
                                                 <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">Catatan Tambahan:</p>
@@ -1258,13 +1295,13 @@
                                                 <h4 class="font-bold text-slate-800 mb-3 text-sm">Berkas Lampiran</h4>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                        <button type="button" @click="viewFile(path)" class="flex items-center p-2 bg-white border border-slate-200 rounded-lg hover:border-bedas-300 hover:shadow-sm transition-all group text-left w-full">
-                                                            <div class="w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600">
+                                                        <button type="button" @click="viewFile(path)" class="flex items-center p-2 rounded-lg transition-all group text-left w-full border" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'bg-red-50 border-red-300 ring-2 ring-red-100 hover:border-red-400' : 'bg-white border-slate-200 hover:border-bedas-300 hover:shadow-sm'">
+                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'bg-red-100 text-red-500' : 'bg-slate-100 text-slate-500 group-hover:bg-bedas-50 group-hover:text-bedas-600'">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                                             </div>
                                                             <div class="overflow-hidden">
-                                                                <p class="text-xs font-bold text-slate-700 uppercase" x-text="key.replace('_', ' ').replace('ktp', 'KTP').replace('kk', 'KK')"></p>
-                                                                <p class="text-[10px] text-slate-400 truncate">Klik untuk lihat</p>
+                                                                <p class="text-xs font-bold uppercase" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'text-red-700' : 'text-slate-700'" x-text="key.replace('_', ' ').replace('ktp', 'KTP').replace('kk', 'KK')"></p>
+                                                                <p class="text-[10px] truncate" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'text-red-500' : 'text-slate-400'" x-text="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'Berkas Tidak Sesuai' : 'Klik untuk lihat'"></p>
                                                             </div>
                                                         </button>
                                                     </template>
@@ -1319,13 +1356,13 @@
                                                 <h4 class="font-bold text-slate-800 mb-3 text-sm">Berkas Lampiran</h4>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                        <button type="button" @click="viewFile(path)" class="flex items-center p-2 bg-white border border-slate-200 rounded-lg hover:border-bedas-300 hover:shadow-sm transition-all group text-left w-full">
-                                                            <div class="w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600">
+                                                        <button type="button" @click="viewFile(path)" class="flex items-center p-2 rounded-lg transition-all group text-left w-full border" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'bg-red-50 border-red-300 ring-2 ring-red-100 hover:border-red-400' : 'bg-white border-slate-200 hover:border-bedas-300 hover:shadow-sm'">
+                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'bg-red-100 text-red-500' : 'bg-slate-100 text-slate-500 group-hover:bg-bedas-50 group-hover:text-bedas-600'">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                                             </div>
                                                             <div class="overflow-hidden">
-                                                                <p class="text-xs font-bold text-slate-700 uppercase" x-text="key.replace('_', ' ').replace('ktp', 'KTP').replace('kk', 'KK')"></p>
-                                                                <p class="text-[10px] text-slate-400 truncate">Klik untuk lihat</p>
+                                                                <p class="text-xs font-bold uppercase" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'text-red-700' : 'text-slate-700'" x-text="key.replace('_', ' ').replace('ktp', 'KTP').replace('kk', 'KK')"></p>
+                                                                <p class="text-[10px] truncate" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'text-red-500' : 'text-slate-400'" x-text="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'Berkas Tidak Sesuai' : 'Klik untuk lihat'"></p>
                                                             </div>
                                                         </button>
                                                     </template>
