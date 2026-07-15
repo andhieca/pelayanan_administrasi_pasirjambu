@@ -730,21 +730,12 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hari</label>
-                                                    <select name="pernikahan[hari]" x-model="pernikahan.hari" @change="emptyFields['pernikahan.hari'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.hari']}">
-                                                        <option value="">Pilih Hari</option>
-                                                        <option value="Senin">Senin</option>
-                                                        <option value="Selasa">Selasa</option>
-                                                        <option value="Rabu">Rabu</option>
-                                                        <option value="Kamis">Kamis</option>
-                                                        <option value="Jumat">Jumat</option>
-                                                        <option value="Sabtu">Sabtu</option>
-                                                        <option value="Minggu">Minggu</option>
-                                                    </select>
+                                                    <input type="text" name="pernikahan[hari]" x-model="pernikahan.hari" readonly class="w-full border-slate-300 rounded-lg bg-slate-50 cursor-not-allowed text-sm text-slate-500 focus:ring-0 focus:border-slate-300" placeholder="Pilih tanggal dahulu">
                                                     <p x-show="formSubmitted && emptyFields['pernikahan.hari']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pernikahan.hari']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tanggal</label>
-                                                    <input type="date" name="pernikahan[tanggal]" x-model="pernikahan.tanggal" @input="emptyFields['pernikahan.tanggal'] = null" min="{{ date('Y-m-d') }}" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.tanggal']}">
+                                                    <input type="date" name="pernikahan[tanggal]" x-model="pernikahan.tanggal" @input="emptyFields['pernikahan.tanggal'] = null; emptyFields['pernikahan.hari'] = null; if($event.target.value){ const d = new Date($event.target.value); const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']; pernikahan.hari = days[d.getDay()]; } else { pernikahan.hari = ''; }" min="{{ date('Y-m-d') }}" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.tanggal']}">
                                                     <p x-show="formSubmitted && emptyFields['pernikahan.tanggal']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pernikahan.tanggal']"></p>
                                                 </div>
                                                 <div>
