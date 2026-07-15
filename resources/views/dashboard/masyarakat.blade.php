@@ -39,6 +39,11 @@
         previewType: '', // 'image' or 'pdf'
         existingFiles: {}, // Metadata for existing uploaded files
         isDraftValue: 0,
+        rejectedItems: [],
+
+        isRejected(label) {
+            return this.rejectedItems.includes(label);
+        },
 
         viewFile(path) {
             this.previewUrl = '/berkas/' + path;
@@ -273,6 +278,7 @@
             this.alasan = '';
             this.whatsapp = '';
             this.isDraftValue = 0;
+            this.rejectedItems = [];
         },
         editPermohonan(item) {
             this.activeTab = 'create';
@@ -293,6 +299,7 @@
                 this.whatsapp = item.metadata.whatsapp || '';
                 this.existingFiles = item.metadata.files || {};
             }
+            this.rejectedItems = item.invalid_items || [];
         }
     }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -458,7 +465,11 @@
                                     <div x-show="selectedLayanan == 'Dispen Nikah'" class="space-y-8 mb-8">
                                         
                                         <!-- Calon Suami -->
-                                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <div class="p-6 rounded-2xl border" :class="isRejected('Data Calon Suami') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isRejected('Data Calon Suami')" class="text-xs font-bold text-red-600 mb-3 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1.5 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                Bagian ini perlu diperbaiki
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                                 <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">👨</span>
                                                 Data Calon Suami
@@ -525,7 +536,11 @@
                                         </div>
 
                                         <!-- Calon Istri -->
-                                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <div class="p-6 rounded-2xl border" :class="isRejected('Data Calon Istri') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isRejected('Data Calon Istri')" class="text-xs font-bold text-red-600 mb-3 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1.5 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                Bagian ini perlu diperbaiki
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                                 <span class="w-8 h-8 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center text-sm">👩</span>
                                                 Data Calon Istri
@@ -592,7 +607,11 @@
                                         </div>
 
                                         <!-- Rencana Pernikahan -->
-                                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <div class="p-6 rounded-2xl border" :class="isRejected('Rencana Pernikahan') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isRejected('Rencana Pernikahan')" class="text-xs font-bold text-red-600 mb-3 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1.5 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                Bagian ini perlu diperbaiki
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                                 <span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-sm">📅</span>
                                                 Rencana Pernikahan
@@ -673,8 +692,11 @@
                                                         'n4' => '9. N4 Persetujuan Pengantin',
                                                         'n10' => '10. N10 Rekomendasi KUA'
                                                     ] as $key => $label)
-                                                                                                                                <div>
-                                                                                                                                    <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">{{ $label }}</label>
+                                                                                                                                <div :class="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}') ? 'bg-red-50 border-red-300 ring-2 ring-red-100 p-3 rounded-xl border' : ''">
+                                                                                                                                    <label class="block text-slate-700 text-xs font-bold mb-1 uppercase" :class="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}') ? 'text-red-700' : ''">{{ $label }}</label>
+                                                                                                                                    <div x-show="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                                                                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Perbaiki Berkas Ini
+                                                                                                                                    </div>
                                                                                                                                     <input type="file" name="files[{{ $key }}]" @change="handleFileUpload($event, '{{ $key }}')" accept=".pdf,image/*" 
                                                                                                                                         class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-bedas-50 file:text-bedas-700 hover:file:bg-bedas-100"
                                                                                                                                         :required="selectedLayanan === 'Dispen Nikah' && !isEdit && '{{ $key }}' !== 'n1_suami' && isDraftValue == 0"> 
@@ -698,7 +720,11 @@
                                     <div x-show="selectedLayanan == 'Izin Keramaian'" class="space-y-8 mb-8">
                                         
                                         <!-- Data Pemohon -->
-                                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <div class="p-6 rounded-2xl border" :class="isRejected('Data Pemohon') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isRejected('Data Pemohon')" class="text-xs font-bold text-red-600 mb-3 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1.5 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                Bagian ini perlu diperbaiki
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                                 <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm">👤</span>
                                                 Data Pemohon
@@ -786,8 +812,11 @@
                                                         'ktp' => '1. KTP Pemohon',
                                                         'proposal_acara' => '2. Proposal Acara'
                                                     ] as $key => $label)
-                                                                                                        <div>
-                                                                                                            <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">{{ $label }}</label>
+                                                                                                        <div :class="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}') ? 'bg-red-50 border-red-300 ring-2 ring-red-100 p-3 rounded-xl border' : ''">
+                                                                                                            <label class="block text-slate-700 text-xs font-bold mb-1 uppercase" :class="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}') ? 'text-red-700' : ''">{{ $label }}</label>
+                                                                                                            <div x-show="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Perbaiki Berkas Ini
+                                                                                                            </div>
                                                                                                             <input type="file" name="files[{{ $key }}]" @change="handleFileUpload($event, '{{ $key }}')" accept=".pdf,image/*" 
                                                                                                                 class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-bedas-50 file:text-bedas-700 hover:file:bg-bedas-100"
                                                                                                                 :required="selectedLayanan === 'Izin Keramaian' && !isEdit && isDraftValue == 0"> 
@@ -809,7 +838,11 @@
                                     <!-- Conditional Input for Rekomendasi Bantuan -->
                                     <div x-show="selectedLayanan == 'Rekomendasi Bantuan'" class="space-y-8 mb-8">
                                         <!-- Data Rekomendasi -->
-                                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <div class="p-6 rounded-2xl border" :class="isRejected('Data Rekomendasi Bantuan') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isRejected('Data Rekomendasi Bantuan')" class="text-xs font-bold text-red-600 mb-3 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1.5 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                Bagian ini perlu diperbaiki
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                                 <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm">📋</span>
                                                 Data Rekomendasi Bantuan
@@ -847,7 +880,11 @@
                                         </div>
 
                                         <!-- Upload Berkas Rekomendasi Bantuan -->
-                                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                        <div class="p-6 rounded-2xl border" :class="isRejected('Berkas Persyaratan') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isRejected('Berkas Persyaratan')" class="text-xs font-bold text-red-600 mb-3 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1.5 rounded-lg">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                                Bagian ini perlu diperbaiki
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                                 <span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-sm">📂</span>
                                                 Berkas Persyaratan
@@ -856,8 +893,11 @@
                                                 @foreach([
                                                         'proposal' => '1. Proposal Bantuan'
                                                     ] as $key => $label)
-                                                        <div>
-                                                            <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">{{ $label }}</label>
+                                                        <div :class="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}') ? 'bg-red-50 border-red-300 ring-2 ring-red-100 p-3 rounded-xl border' : ''">
+                                                            <label class="block text-slate-700 text-xs font-bold mb-1 uppercase" :class="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}') ? 'text-red-700' : ''">{{ $label }}</label>
+                                                            <div x-show="isRejected('Berkas ' + '{{ strtoupper(str_replace('_', ' ', $key)) }}')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Perbaiki Berkas Ini
+                                                            </div>
                                                             <input type="file" name="files[{{ $key }}]" @change="handleFileUpload($event, '{{ $key }}')" accept=".pdf,image/*" 
                                                                 class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-bedas-50 file:text-bedas-700 hover:file:bg-bedas-100"
                                                                 :required="selectedLayanan === 'Rekomendasi Bantuan' && !isEdit && isDraftValue == 0"> 
@@ -877,9 +917,14 @@
 
                                     <!-- Single File Upload for Other Services -->
                                     <div x-show="selectedLayanan != 'Dispen Nikah' && selectedLayanan != 'Izin Keramaian' && selectedLayanan != 'Rekomendasi Bantuan'" class="mb-6">
-                                        <label class="block text-slate-700 text-sm font-semibold mb-2">Unggah Berkas Persyaratan (PDF/IMG)</label>
+                                        <div class="flex items-center justify-between mb-2">
+                                            <label class="block text-slate-700 text-sm font-semibold mb-0" :class="isRejected('Berkas MAIN FILE') ? 'text-red-700' : ''">Unggah Berkas Persyaratan (PDF/IMG)</label>
+                                            <div x-show="isRejected('Berkas MAIN FILE')" class="text-xs font-bold text-red-600 flex items-center gap-1 bg-red-100/50 w-fit px-3 py-1 rounded-lg">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Perbaiki Berkas Ini
+                                            </div>
+                                        </div>
                                         <div class="flex items-center justify-center w-full">
-                                            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full min-h-[128px] border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors relative overflow-hidden">
+                                            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full min-h-[128px] border-2 border-dashed rounded-xl cursor-pointer transition-colors relative overflow-hidden" :class="isRejected('Berkas MAIN FILE') ? 'border-red-400 bg-red-50 hover:bg-red-100 ring-4 ring-red-500/10' : 'border-slate-300 bg-slate-50 hover:bg-slate-100'">
                                                 <!-- Initial State -->
                                                 <div class="flex flex-col items-center justify-center pt-5 pb-6" x-show="!fileName">
                                                     <svg class="w-8 h-8 mb-3 text-slate-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
