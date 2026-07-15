@@ -45,6 +45,13 @@
             return this.rejectedItems.includes(label);
         },
 
+        isDetailRejected(label) {
+            if (!this.selectedPermohonan || !this.selectedPermohonan.invalid_items) return false;
+            const items = this.selectedPermohonan.invalid_items;
+            if (Array.isArray(items)) return items.includes(label);
+            return Object.values(items).includes(label);
+        },
+
         viewFile(path) {
             this.previewUrl = '/berkas/' + path;
             const extension = path.split('.').pop().toLowerCase();
@@ -1156,11 +1163,11 @@
                                             </div>
                                         </div>
 
-                                        <template x-if="selectedPermohonan.invalid_items && selectedPermohonan.invalid_items.length > 0">
+                                        <template x-if="selectedPermohonan.invalid_items && Object.values(selectedPermohonan.invalid_items).length > 0">
                                             <div class="pl-11">
                                                 <p class="text-xs font-semibold text-red-800 mb-2 uppercase tracking-wide">Item yang tidak sesuai:</p>
                                                 <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                                                    <template x-for="item in selectedPermohonan.invalid_items">
+                                                    <template x-for="item in Object.values(selectedPermohonan.invalid_items)">
                                                         <li x-text="item"></li>
                                                     </template>
                                                 </ul>
@@ -1180,7 +1187,10 @@
                                 <template x-if="selectedPermohonan.jenis_layanan === 'Dispen Nikah' && selectedPermohonan.metadata">
                                     <div class="space-y-4 mt-4">
                                         <!-- Data Pasangan -->
-                                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <div class="p-4 rounded-xl border" :class="isDetailRejected('Data Calon Suami') || isDetailRejected('Data Calon Istri') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isDetailRejected('Data Calon Suami') || isDetailRejected('Data Calon Istri')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Data Pasangan Tidak Sesuai
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
                                                 <span>❤️</span> Data Pasangan
                                             </h4>
@@ -1211,7 +1221,10 @@
                                         </div>
 
                                         <!-- Rencana Pernikahan -->
-                                        <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                                        <div class="p-4 rounded-xl border" :class="isDetailRejected('Rencana Pernikahan') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-purple-50 border-purple-100'">
+                                            <div x-show="isDetailRejected('Rencana Pernikahan')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Rencana Pernikahan Tidak Sesuai
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
                                                 <span>📅</span> Rencana Pernikahan
                                             </h4>
@@ -1265,7 +1278,10 @@
                                 <template x-if="selectedPermohonan.jenis_layanan === 'Izin Keramaian' && selectedPermohonan.metadata">
                                     <div class="space-y-4 mt-4">
                                         <!-- Data Pemohon -->
-                                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <div class="p-4 rounded-xl border" :class="isDetailRejected('Data Pemohon') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isDetailRejected('Data Pemohon')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Data Pemohon Tidak Sesuai
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
                                                 <span>👤</span> Data Pemohon
                                             </h4>
@@ -1282,7 +1298,10 @@
                                         </div>
 
                                         <!-- Maksud Keramaian -->
-                                        <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                        <div class="p-4 rounded-xl border" :class="isDetailRejected('Maksud Keramaian') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-orange-50 border-orange-100'">
+                                            <div x-show="isDetailRejected('Maksud Keramaian')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Maksud Keramaian Tidak Sesuai
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
                                                 <span>🎉</span> Maksud Keramaian
                                             </h4>
@@ -1320,7 +1339,10 @@
                                 <template x-if="selectedPermohonan.jenis_layanan === 'Rekomendasi Bantuan' && selectedPermohonan.metadata">
                                     <div class="space-y-4 mt-4">
                                         <!-- Data Rekomendasi -->
-                                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                        <div class="p-4 rounded-xl border" :class="isDetailRejected('Data Rekomendasi Bantuan') ? 'bg-red-50 border-red-300 ring-2 ring-red-100' : 'bg-slate-50 border-slate-100'">
+                                            <div x-show="isDetailRejected('Data Rekomendasi Bantuan')" class="text-xs font-bold text-red-600 mb-2 flex items-center gap-1 bg-red-100/50 w-fit px-2 py-1 rounded">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Data Rekomendasi Tidak Sesuai
+                                            </div>
                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
                                                 <span>📋</span> Data Rekomendasi Bantuan
                                             </h4>
@@ -1341,13 +1363,13 @@
                                                 <h4 class="font-bold text-slate-800 mb-3 text-sm">Berkas Lampiran</h4>
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                        <button type="button" @click="viewFile(path)" class="flex items-center p-2 bg-white border border-slate-200 rounded-lg hover:border-bedas-300 hover:shadow-sm transition-all group text-left w-full">
-                                                            <div class="w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600">
+                                                        <button type="button" @click="viewFile(path)" class="flex items-center p-2 rounded-lg transition-all group text-left w-full border" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'bg-red-50 border-red-300 ring-2 ring-red-100 hover:border-red-400' : 'bg-white border-slate-200 hover:border-bedas-300 hover:shadow-sm'">
+                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'bg-red-100 text-red-500' : 'bg-slate-100 text-slate-500 group-hover:bg-bedas-50 group-hover:text-bedas-600'">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                                             </div>
                                                             <div class="overflow-hidden">
-                                                                <p class="text-xs font-bold text-slate-700 uppercase" x-text="key.replace('_', ' ')"></p>
-                                                                <p class="text-[10px] text-slate-400 truncate">Klik untuk lihat</p>
+                                                                <p class="text-xs font-bold uppercase" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'text-red-700' : 'text-slate-700'" x-text="key.replace('_', ' ')"></p>
+                                                                <p class="text-[10px]" :class="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'text-red-500' : 'text-slate-400 truncate'" x-text="isDetailRejected('Berkas ' + key.replace('_', ' ').toUpperCase()) ? 'Berkas Tidak Sesuai' : 'Klik untuk lihat'"></p>
                                                             </div>
                                                         </button>
                                                     </template>
