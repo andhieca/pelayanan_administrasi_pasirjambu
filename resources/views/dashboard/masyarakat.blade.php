@@ -904,7 +904,7 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hari / Tanggal</label>
-                                                    <input type="text" name="keramaian[tanggal]" x-model="keramaian.tanggal" @input="keramaian.tanggal = sanitizeTtl($event.target.value); emptyFields['keramaian.tanggal'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['keramaian.tanggal']}" placeholder="Contoh: Sabtu, 1 Februari 2026">
+                                                    <input type="date" name="keramaian[tanggal]" x-model="keramaian.tanggal" @input="emptyFields['keramaian.tanggal'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['keramaian.tanggal']}">
                                                     <p x-show="formSubmitted && emptyFields['keramaian.tanggal']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['keramaian.tanggal']"></p>
                                                 </div>
                                                 <div>
