@@ -445,7 +445,7 @@
                                     </button>
                                 </div>
 
-                                <form :action="isEdit ? '{{ url('dashboard/masyarakat') }}/' + editId : '{{ route('masyarakat.store') }}'" 
+                                <form :action="isEdit ? '{{ url('masyarakat/permohonan') }}/' + editId : '{{ route('masyarakat.store') }}'" 
                                     @submit.prevent="isDraftValue == 1 || validateForm() ? $el.submit() : null"
                                     method="POST" enctype="multipart/form-data">
                                     @csrf
