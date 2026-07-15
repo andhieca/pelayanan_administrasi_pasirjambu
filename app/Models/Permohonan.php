@@ -12,6 +12,7 @@ class Permohonan extends Model
 
     protected $casts = [
         'metadata' => 'array',
+        'invalid_items' => 'array',
     ];
 
     public function user(): BelongsTo

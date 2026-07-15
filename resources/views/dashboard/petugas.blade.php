@@ -31,10 +31,6 @@
     </x-slot>
 
     <div class="py-12" x-data="{ 
-        showModal: false, 
-        selectedId: null, 
-        actionType: '', 
-        keterangan: '', 
         showDetailModal: false, 
         selectedPermohonan: null,
         showNomorModal: false,
@@ -46,6 +42,17 @@
         activeFileType: 'image',
         activeFileKey: null,
         validatedFiles: {}, // Format: { permohonanId: { fileKey: true } }
+        
+        // Verifikasi State
+        invalidItems: [], // Array of string descriptions for invalid items
+        showKeteranganInput: false,
+
+        openDetail(p) {
+            this.selectedPermohonan = p;
+            this.invalidItems = []; // reset
+            this.showKeteranganInput = false;
+            this.showDetailModal = true;
+        },
 
         openFilePreview(path, key) {
             this.activeFileSrc = '/berkas/' + path;
@@ -133,22 +140,17 @@
                                         </div>
 
                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-t border-slate-100 pt-4 mt-4 gap-4 sm:gap-0">
-                                            <button @click="showDetailModal = true; selectedPermohonan = {{ $p }}" class="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+                                            <button @click="openDetail({{ $p }})" class="flex items-center text-sm font-medium transition-colors" :class="selectedId === {{ $p->id }} ? 'text-blue-700 font-bold' : 'text-blue-600 hover:text-blue-700'">
                                                 <svg class="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                Lihat Detail & Berkas
+                                                @if($index === 0)
+                                                    Verifikasi Berkas
+                                                @else
+                                                    Lihat Detail & Berkas
+                                                @endif
                                             </button>
 
                                             <div class="flex w-full sm:w-auto gap-2 sm:gap-3">
-                                                @if($index === 0)
-                                                    <button @click="showModal = true; selectedId = {{ $p->id }}; actionType = 'reject'" 
-                                                        class="flex-1 sm:flex-none justify-center px-4 py-2 bg-white border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition-colors">
-                                                        Tolak
-                                                    </button>
-                                                    <button @click="showModal = true; selectedId = {{ $p->id }}; actionType = 'approve'"
-                                                        class="flex-1 sm:flex-none justify-center px-5 py-2 bg-bedas-600 text-white text-sm font-semibold rounded-lg shadow-lg shadow-bedas-200 hover:bg-bedas-700 transition-all transform hover:-translate-y-0.5">
-                                                        Validasi
-                                                    </button>
-                                                @else
+                                                @if($index !== 0)
                                                     <span class="flex-1 sm:flex-none justify-center px-4 py-2 text-slate-400 text-sm font-medium cursor-not-allowed flex items-center gap-1 bg-slate-50 sm:bg-transparent rounded-lg sm:rounded-none">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                                         Terkunci
@@ -317,7 +319,13 @@
                                             </h4>
                                             <div class="grid grid-cols-1 gap-4 text-sm">
                                                 <div class="pb-3 border-b border-slate-200">
-                                                    <p class="text-xs text-slate-500 font-semibold mb-1">CALON SUAMI</p>
+                                                    <div class="flex justify-between items-center mb-2">
+                                                        <p class="text-xs text-slate-500 font-semibold">CALON SUAMI</p>
+                                                        <label class="flex items-center gap-1 cursor-pointer">
+                                                            <input type="checkbox" value="Data Calon Suami" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-3.5 h-3.5">
+                                                            <span class="text-xs text-red-500 font-medium">Tidak Sesuai</span>
+                                                        </label>
+                                                    </div>
                                                     <div class="grid grid-cols-2 gap-x-2 gap-y-1">
                                                         <span class="text-slate-400">Nama:</span> <span class="font-medium text-slate-800" x-text="selectedPermohonan.metadata.suami?.nama"></span>
                                                         <span class="text-slate-400">NIK:</span> <span class="text-slate-700" x-text="selectedPermohonan.metadata.suami?.nik"></span>
@@ -328,7 +336,13 @@
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <p class="text-xs text-slate-500 font-semibold mb-1">CALON ISTRI</p>
+                                                    <div class="flex justify-between items-center mb-2">
+                                                        <p class="text-xs text-slate-500 font-semibold">CALON ISTRI</p>
+                                                        <label class="flex items-center gap-1 cursor-pointer">
+                                                            <input type="checkbox" value="Data Calon Istri" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-3.5 h-3.5">
+                                                            <span class="text-xs text-red-500 font-medium">Tidak Sesuai</span>
+                                                        </label>
+                                                    </div>
                                                     <div class="grid grid-cols-2 gap-x-2 gap-y-1">
                                                         <span class="text-slate-400">Nama:</span> <span class="font-medium text-slate-800" x-text="selectedPermohonan.metadata.istri?.nama"></span>
                                                         <span class="text-slate-400">NIK:</span> <span class="text-slate-700" x-text="selectedPermohonan.metadata.istri?.nik"></span>
@@ -343,9 +357,15 @@
 
                                         <!-- Rencana Pernikahan -->
                                         <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
-                                            <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
-                                                <span>📅</span> Rencana Pernikahan
-                                            </h4>
+                                            <div class="flex justify-between items-center mb-3">
+                                                <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                                    <span>📅</span> Rencana Pernikahan
+                                                </h4>
+                                                <label class="flex items-center gap-1 cursor-pointer">
+                                                    <input type="checkbox" value="Rencana Pernikahan" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-purple-300 w-3.5 h-3.5">
+                                                    <span class="text-xs text-red-500 font-medium">Tidak Sesuai</span>
+                                                </label>
+                                            </div>
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                                                 <div>
                                                     <span class="block text-xs text-slate-500">Hari & Tanggal</span>
@@ -405,9 +425,15 @@
                                     <div class="space-y-4">
                                          <!-- Data Pemohon -->
                                          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
-                                                 <span>👤</span> Data Pemohon
-                                             </h4>
+                                             <div class="flex justify-between items-center mb-3">
+                                                 <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                                     <span>👤</span> Data Pemohon
+                                                 </h4>
+                                                 <label class="flex items-center gap-1 cursor-pointer">
+                                                     <input type="checkbox" value="Data Pemohon" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-3.5 h-3.5">
+                                                     <span class="text-xs text-red-500 font-medium">Tidak Sesuai</span>
+                                                 </label>
+                                             </div>
                                              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                                                  <p><span class="text-slate-400 w-24 inline-block">Nama:</span> <span class="font-medium text-slate-800" x-text="selectedPermohonan.metadata.pemohon?.nama"></span></p>
                                                  <p><span class="text-slate-400 w-24 inline-block">NIK:</span> <span class="text-slate-700" x-text="selectedPermohonan.metadata.pemohon?.nik"></span></p>
@@ -422,9 +448,15 @@
 
                                          <!-- Maksud Keramaian -->
                                          <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
-                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
-                                                 <span>🎉</span> Maksud Keramaian
-                                             </h4>
+                                             <div class="flex justify-between items-center mb-3">
+                                                 <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                                     <span>🎉</span> Maksud Keramaian
+                                                 </h4>
+                                                 <label class="flex items-center gap-1 cursor-pointer">
+                                                     <input type="checkbox" value="Maksud Keramaian" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-orange-300 w-3.5 h-3.5">
+                                                     <span class="text-xs text-red-500 font-medium">Tidak Sesuai</span>
+                                                 </label>
+                                             </div>
                                              <div class="space-y-2 text-sm">
                                                  <p><span class="text-slate-500 w-32 inline-block">Hari / Tanggal:</span> <span class="font-medium text-slate-800" x-text="selectedPermohonan.metadata.keramaian?.tanggal"></span></p>
                                                  <p><span class="text-slate-500 w-32 inline-block">Acara:</span> <span class="font-medium text-slate-800" x-text="selectedPermohonan.metadata.keramaian?.acara"></span></p>
@@ -439,24 +471,30 @@
                                              <template x-if="selectedPermohonan.metadata.files">
                                                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                      <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                         <button type="button" @click="openFilePreview(path, key)" class="flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group w-full text-left relative overflow-hidden"
-                                                            :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
-                                                            
-                                                            <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
-                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                                            </div>
+                                                        <div class="flex items-center gap-2">
+                                                             <button type="button" @click="openFilePreview(path, key)" class="flex-1 flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group text-left relative overflow-hidden"
+                                                                :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
+                                                                
+                                                                <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                                </div>
 
-                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
-                                                                :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
-                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                                             </div>
-                                                             <div class="overflow-hidden">
-                                                                 <p class="text-xs font-bold uppercase" 
-                                                                    :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
-                                                                    x-text="key.replace('_', ' ').replace('ktp', 'KTP')"></p>
-                                                                 <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
-                                                             </div>
-                                                         </button>
+                                                                <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
+                                                                    :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
+                                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                                 </div>
+                                                                 <div class="overflow-hidden">
+                                                                     <p class="text-xs font-bold uppercase" 
+                                                                        :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
+                                                                        x-text="key.replace('_', ' ').replace('ktp', 'KTP')"></p>
+                                                                     <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
+                                                                 </div>
+                                                             </button>
+                                                             <label class="flex flex-col items-center cursor-pointer min-w-[40px]">
+                                                                <input type="checkbox" :value="'Berkas ' + key.replace('_', ' ').toUpperCase()" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-4 h-4 mb-1">
+                                                                <span class="text-[9px] text-red-500 font-medium">Tolak</span>
+                                                            </label>
+                                                         </div>
                                                      </template>
                                                  </div>
                                              </template>
@@ -469,9 +507,15 @@
                                      <div class="space-y-4">
                                          <!-- Data Rekomendasi -->
                                          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                                             <h4 class="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
-                                                 <span>📋</span> Data Rekomendasi Bantuan
-                                             </h4>
+                                             <div class="flex justify-between items-center mb-3">
+                                                 <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                                     <span>📋</span> Data Rekomendasi Bantuan
+                                                 </h4>
+                                                 <label class="flex items-center gap-1 cursor-pointer">
+                                                     <input type="checkbox" value="Data Rekomendasi Bantuan" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-3.5 h-3.5">
+                                                     <span class="text-xs text-red-500 font-medium">Tidak Sesuai</span>
+                                                 </label>
+                                             </div>
                                              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-sm">
                                                  <p><span class="text-slate-400 w-28 inline-block">Jenis Kelp:</span> <span class="font-medium text-slate-800" x-text="selectedPermohonan.metadata.rekomendasi?.jenis_kelompok"></span></p>
                                                  <p><span class="text-slate-400 w-28 inline-block">Nama Kelp:</span> <span class="text-slate-700" x-text="selectedPermohonan.metadata.rekomendasi?.nama_kelompok"></span></p>
@@ -489,25 +533,31 @@
                                              <template x-if="selectedPermohonan.metadata.files">
                                                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                      <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                         <button type="button" @click="openFilePreview(path, key)" class="flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group w-full text-left relative overflow-hidden"
-                                                            :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
-                                                            
-                                                            <!-- Validated Badge -->
-                                                            <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
-                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                                            </div>
+                                                         <div class="flex items-center gap-2">
+                                                            <button type="button" @click="openFilePreview(path, key)" class="flex-1 flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group text-left relative overflow-hidden"
+                                                                :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
+                                                                
+                                                                <!-- Validated Badge -->
+                                                                <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                                </div>
 
-                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
-                                                                :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
-                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                                             </div>
-                                                             <div class="overflow-hidden">
-                                                                 <p class="text-xs font-bold uppercase" 
-                                                                    :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
-                                                                    x-text="key.replace('_', ' ')"></p>
-                                                                 <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
-                                                             </div>
-                                                         </button>
+                                                                <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
+                                                                    :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
+                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                                </div>
+                                                                <div class="overflow-hidden">
+                                                                    <p class="text-xs font-bold uppercase" 
+                                                                        :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
+                                                                        x-text="key.replace('_', ' ')"></p>
+                                                                    <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
+                                                                </div>
+                                                            </button>
+                                                            <label class="flex flex-col items-center cursor-pointer min-w-[40px]">
+                                                                <input type="checkbox" :value="'Berkas ' + key.replace('_', ' ').toUpperCase()" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-4 h-4 mb-1">
+                                                                <span class="text-[9px] text-red-500 font-medium">Tolak</span>
+                                                            </label>
+                                                         </div>
                                                      </template>
                                                  </div>
                                              </template>
@@ -540,10 +590,30 @@
                             </div>
                         </template>
                     </div>
-                    <div class="bg-slate-50 px-6 py-4 flex flex-row-reverse">
-                         <button type="button" @click="showDetailModal = false" class="w-full inline-flex justify-center rounded-xl border border-slate-300 px-4 py-2 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors sm:w-auto">
-                            Tutup
-                        </button>
+                    <div class="bg-slate-50 px-6 py-4 flex flex-col items-end border-t border-slate-200">
+                         <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full">
+                            @csrf
+                            <input type="hidden" name="action" :value="invalidItems.length > 0 ? 'reject' : 'approve'">
+                            
+                            <template x-for="item in invalidItems">
+                                <input type="hidden" name="invalid_items[]" :value="item">
+                            </template>
+
+                            <div x-show="invalidItems.length > 0" x-collapse class="w-full mb-4">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Penolakan Tambahan (Opsional)</label>
+                                <textarea name="keterangan" rows="2" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 text-sm" placeholder="Tambahkan pesan khusus jika diperlukan..."></textarea>
+                            </div>
+                            
+                            <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 w-full">
+                                <button type="button" @click="showDetailModal = false" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-300 px-5 py-2 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                                    Tutup
+                                </button>
+                                <button type="submit" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all"
+                                        :class="invalidItems.length > 0 ? 'bg-red-600 hover:bg-red-700' : 'bg-bedas-600 hover:bg-bedas-700'"
+                                        x-text="invalidItems.length > 0 ? 'Tolak Permohonan (' + invalidItems.length + ' item)' : 'Setujui & Teruskan ke Camat'">
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

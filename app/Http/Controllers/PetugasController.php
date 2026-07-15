@@ -30,9 +30,10 @@ class PetugasController extends Controller
     {
         $request->validate([
             'action' => 'required|in:approve,reject',
-            'keterangan' => 'required_if:action,reject|nullable|string|max:500',
+            'keterangan' => 'nullable|string|max:500',
+            'invalid_items' => 'nullable|array',
+            'invalid_items.*' => 'string'
         ], [
-            'keterangan.required_if' => 'Keterangan wajib diisi jika menolak permohonan.',
             'keterangan.max' => 'Keterangan maksimal 500 karakter.',
         ]);
 
@@ -48,6 +49,7 @@ class PetugasController extends Controller
             $permohonan->update([
                 'status' => 'ditolak',
                 'keterangan' => $request->keterangan,
+                'invalid_items' => $request->invalid_items ?? [],
             ]);
             $permohonan->logs()->create([
                 'action' => 'rejected',

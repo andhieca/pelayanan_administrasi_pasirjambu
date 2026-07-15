@@ -1099,13 +1099,37 @@
                                             'bg-emerald-100 text-emerald-800': selectedPermohonan.status == 'disetujui'
                                         }" x-text="selectedPermohonan.status.replace('_', ' ').toUpperCase()"></span>
                                 </div>
-                                <template x-if="selectedPermohonan.keterangan">
-                                    <div class="bg-red-50 p-3 rounded-lg border border-red-100">
-                                        <label class="block text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Catatan Penolakan</label>
-                                        <p class="text-sm text-red-700 italic" x-text="selectedPermohonan.keterangan"></p>
+                                <template x-if="selectedPermohonan.status === 'ditolak'">
+                                    <div class="bg-red-50 p-4 rounded-xl border border-red-200 space-y-3">
+                                        <div class="flex items-start gap-3">
+                                            <div class="bg-red-100 text-red-600 p-2 rounded-lg shrink-0">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                            </div>
+                                            <div class="flex-1">
+                                                <h4 class="text-red-800 font-bold text-sm">Permohonan Dikembalikan</h4>
+                                                <p class="text-red-600 text-xs mt-1">Terdapat data atau berkas yang tidak sesuai. Silakan buat permohonan baru dengan memperbaiki bagian yang salah.</p>
+                                            </div>
+                                        </div>
+
+                                        <template x-if="selectedPermohonan.invalid_items && selectedPermohonan.invalid_items.length > 0">
+                                            <div class="pl-11">
+                                                <p class="text-xs font-semibold text-red-800 mb-2 uppercase tracking-wide">Item yang tidak sesuai:</p>
+                                                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+                                                    <template x-for="item in selectedPermohonan.invalid_items">
+                                                        <li x-text="item"></li>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </template>
+
+                                        <template x-if="selectedPermohonan.keterangan">
+                                            <div class="pl-11 pt-2 border-t border-red-100 mt-2">
+                                                <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">Catatan Tambahan:</p>
+                                                <p class="text-sm text-red-700 italic" x-text="selectedPermohonan.keterangan"></p>
+                                            </div>
+                                        </template>
                                     </div>
                                 </template>
-
 
                                 <!-- Metadata Display for Dispen Nikah -->
                                 <template x-if="selectedPermohonan.jenis_layanan === 'Dispen Nikah' && selectedPermohonan.metadata">
