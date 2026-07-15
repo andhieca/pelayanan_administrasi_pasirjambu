@@ -152,14 +152,17 @@
                                         </div>
 
                                         <div class="flex flex-col sm:flex-row sm:items-center justify-between border-t border-slate-100 pt-4 mt-4 gap-4 sm:gap-0">
-                                            <button @click="openDetail({{ $p }})" class="flex items-center text-sm font-medium transition-colors" :class="selectedId === {{ $p->id }} ? 'text-blue-700 font-bold' : 'text-blue-600 hover:text-blue-700'">
-                                                <svg class="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                @if($index === 0)
+                                            @if($index === 0)
+                                                <button @click="openDetail({{ $p }})" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-emerald-200/50 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                                                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                     Verifikasi Berkas
-                                                @else
+                                                </button>
+                                            @else
+                                                <button @click="openDetail({{ $p }})" class="flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-lg">
+                                                    <svg class="w-4 h-4 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                     Lihat Detail & Berkas
-                                                @endif
-                                            </button>
+                                                </button>
+                                            @endif
 
                                             <div class="flex w-full sm:w-auto gap-2 sm:gap-3">
                                                 @if($index !== 0)
