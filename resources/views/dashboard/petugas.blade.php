@@ -561,7 +561,7 @@
                                                          </button>
                                                      </template>
                                                  </div>
-                                             </template>           </template>
+                                             </template>
                                          </div>
                                      </div>
                                  </template>
@@ -621,7 +621,7 @@
         </div>
 
         <!-- File Preview Modal -->
-        <div x-show="showFileModal" class="fixed z-[70] inset-0 overflow-y-auto" style="display: none;">
+        <div x-show="showFileModal" class="fixed inset-0 overflow-y-auto" style="z-index: 9999; display: none;">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center">
                 
                 <div x-show="showFileModal" class="fixed inset-0 transition-opacity" aria-hidden="true" @click="showFileModal = false">
