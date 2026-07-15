@@ -62,14 +62,26 @@
             this.showFileModal = true;
         },
 
-        validateCurrentFile() {
+        formatFileKey(key) {
+            if (!key) return '';
+            return 'Berkas ' + key.replace('_', ' ').toUpperCase();
+        },
+
+        isFileRejected(key) {
+            const fileKey = key || this.activeFileKey;
+            return this.invalidItems.includes(this.formatFileKey(fileKey));
+        },
+
+        toggleFileReject() {
             if (!this.selectedPermohonan) return;
+            const formattedKey = this.formatFileKey(this.activeFileKey);
+            const index = this.invalidItems.indexOf(formattedKey);
             
-            const pId = this.selectedPermohonan.id;
-            if (!this.validatedFiles[pId]) {
-                this.validatedFiles[pId] = {};
+            if (index === -1) {
+                this.invalidItems.push(formattedKey);
+            } else {
+                this.invalidItems.splice(index, 1);
             }
-            this.validatedFiles[pId][this.activeFileKey] = true;
             this.showFileModal = false;
         },
 
@@ -395,22 +407,22 @@
                                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
                                                         <button type="button" @click="openFilePreview(path, key)" class="flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group w-full text-left relative overflow-hidden"
-                                                            :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
+                                                            :class="isFileRejected(key) ? 'border-red-500 bg-red-50' : 'border-slate-200 hover:border-bedas-300'">
                                                             
-                                                            <!-- Validated Badge -->
-                                                            <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
-                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                            <!-- Rejected Badge -->
+                                                            <div x-show="isFileRejected(key)" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-lg">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                             </div>
 
-                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
-                                                                :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
+                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3 transition-colors"
+                                                                :class="isFileRejected(key) ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500 group-hover:bg-bedas-50 group-hover:text-bedas-600'">
                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                                                             </div>
                                                             <div class="overflow-hidden">
                                                                 <p class="text-xs font-bold uppercase" 
-                                                                    :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
+                                                                    :class="isFileRejected(key) ? 'text-red-700' : 'text-slate-700'"
                                                                     x-text="key.replace('_', ' ').replace('ktp', 'KTP').replace('kk', 'KK')"></p>
-                                                                <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
+                                                                <p class="text-[10px] truncate" :class="isFileRejected(key) ? 'text-red-600' : 'text-slate-400'" x-text="isFileRejected(key) ? 'Berkas Ditolak' : 'Klik untuk lihat'"></p>
                                                             </div>
                                                         </button>
                                                     </template>
@@ -471,30 +483,25 @@
                                              <template x-if="selectedPermohonan.metadata.files">
                                                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                      <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                        <div class="flex items-center gap-2">
-                                                             <button type="button" @click="openFilePreview(path, key)" class="flex-1 flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group text-left relative overflow-hidden"
-                                                                :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
-                                                                
-                                                                <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                                                </div>
+                                                        <button type="button" @click="openFilePreview(path, key)" class="flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group w-full text-left relative overflow-hidden"
+                                                            :class="isFileRejected(key) ? 'border-red-500 bg-red-50' : 'border-slate-200 hover:border-bedas-300'">
+                                                            
+                                                            <!-- Rejected Badge -->
+                                                            <div x-show="isFileRejected(key)" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-lg">
+                                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                            </div>
 
-                                                                <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
-                                                                    :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
-                                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                                                 </div>
-                                                                 <div class="overflow-hidden">
-                                                                     <p class="text-xs font-bold uppercase" 
-                                                                        :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
-                                                                        x-text="key.replace('_', ' ').replace('ktp', 'KTP')"></p>
-                                                                     <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
-                                                                 </div>
-                                                             </button>
-                                                             <label class="flex flex-col items-center cursor-pointer min-w-[40px]">
-                                                                <input type="checkbox" :value="'Berkas ' + key.replace('_', ' ').toUpperCase()" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-4 h-4 mb-1">
-                                                                <span class="text-[9px] text-red-500 font-medium">Tolak</span>
-                                                            </label>
-                                                         </div>
+                                                            <div class="w-8 h-8 rounded flex items-center justify-center mr-3 transition-colors"
+                                                                :class="isFileRejected(key) ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500 group-hover:bg-bedas-50 group-hover:text-bedas-600'">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                            </div>
+                                                            <div class="overflow-hidden">
+                                                                <p class="text-xs font-bold uppercase" 
+                                                                    :class="isFileRejected(key) ? 'text-red-700' : 'text-slate-700'"
+                                                                    x-text="key.replace('_', ' ').replace('ktp', 'KTP')"></p>
+                                                                <p class="text-[10px] truncate" :class="isFileRejected(key) ? 'text-red-600' : 'text-slate-400'" x-text="isFileRejected(key) ? 'Berkas Ditolak' : 'Klik untuk lihat'"></p>
+                                                            </div>
+                                                        </button>
                                                      </template>
                                                  </div>
                                              </template>
@@ -533,34 +540,28 @@
                                              <template x-if="selectedPermohonan.metadata.files">
                                                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                      <template x-for="(path, key) in selectedPermohonan.metadata.files" :key="key">
-                                                         <div class="flex items-center gap-2">
-                                                            <button type="button" @click="openFilePreview(path, key)" class="flex-1 flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group text-left relative overflow-hidden"
-                                                                :class="isFileValidated(key) ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300'">
-                                                                
-                                                                <!-- Validated Badge -->
-                                                                <div x-show="isFileValidated(key)" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                                                </div>
+                                                         <button type="button" @click="openFilePreview(path, key)" class="flex items-center p-2 bg-white border rounded-lg hover:shadow-sm transition-all group w-full text-left relative overflow-hidden"
+                                                             :class="isFileRejected(key) ? 'border-red-500 bg-red-50' : 'border-slate-200 hover:border-bedas-300'">
+                                                             
+                                                             <!-- Rejected Badge -->
+                                                             <div x-show="isFileRejected(key)" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-lg">
+                                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                             </div>
 
-                                                                <div class="w-8 h-8 rounded flex items-center justify-center mr-3 group-hover:bg-bedas-50 group-hover:text-bedas-600 transition-colors"
-                                                                    :class="isFileValidated(key) ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'">
-                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                                                </div>
-                                                                <div class="overflow-hidden">
-                                                                    <p class="text-xs font-bold uppercase" 
-                                                                        :class="isFileValidated(key) ? 'text-green-700' : 'text-slate-700'"
-                                                                        x-text="key.replace('_', ' ')"></p>
-                                                                    <p class="text-[10px] truncate" :class="isFileValidated(key) ? 'text-green-600' : 'text-slate-400'" x-text="isFileValidated(key) ? 'Tervalidasi' : 'Klik untuk lihat'"></p>
-                                                                </div>
-                                                            </button>
-                                                            <label class="flex flex-col items-center cursor-pointer min-w-[40px]">
-                                                                <input type="checkbox" :value="'Berkas ' + key.replace('_', ' ').toUpperCase()" x-model="invalidItems" class="rounded text-red-500 focus:ring-red-500 border-slate-300 w-4 h-4 mb-1">
-                                                                <span class="text-[9px] text-red-500 font-medium">Tolak</span>
-                                                            </label>
-                                                         </div>
+                                                             <div class="w-8 h-8 rounded flex items-center justify-center mr-3 transition-colors"
+                                                                 :class="isFileRejected(key) ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500 group-hover:bg-bedas-50 group-hover:text-bedas-600'">
+                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                             </div>
+                                                             <div class="overflow-hidden">
+                                                                 <p class="text-xs font-bold uppercase" 
+                                                                     :class="isFileRejected(key) ? 'text-red-700' : 'text-slate-700'"
+                                                                     x-text="key.replace('_', ' ')"></p>
+                                                                 <p class="text-[10px] truncate" :class="isFileRejected(key) ? 'text-red-600' : 'text-slate-400'" x-text="isFileRejected(key) ? 'Berkas Ditolak' : 'Klik untuk lihat'"></p>
+                                                             </div>
+                                                         </button>
                                                      </template>
                                                  </div>
-                                             </template>
+                                             </template>           </template>
                                          </div>
                                      </div>
                                  </template>
@@ -571,18 +572,18 @@
                                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Berkas Persyaratan</label>
                                         <button type="button" @click="openFilePreview(selectedPermohonan.file_path, 'main_file')" 
                                             class="w-full flex items-center p-3 border rounded-lg hover:shadow-sm transition-all text-left relative overflow-hidden"
-                                            :class="isFileValidated('main_file') ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-bedas-300 bg-white'">
+                                            :class="isFileRejected('main_file') ? 'border-red-500 bg-red-50' : 'border-slate-200 hover:border-bedas-300 bg-white'">
                                             
-                                            <div x-show="isFileValidated('main_file')" class="absolute top-0 right-0 bg-green-500 text-white p-0.5 rounded-bl-lg">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                            <div x-show="isFileRejected('main_file')" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl-lg">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                                             </div>
 
-                                            <div class="mr-3" :class="isFileValidated('main_file') ? 'text-green-600' : 'text-bedas-600'">
+                                            <div class="mr-3" :class="isFileRejected('main_file') ? 'text-red-600' : 'text-bedas-600'">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                             </div>
                                             <div>
-                                                <span class="text-sm font-bold block" :class="isFileValidated('main_file') ? 'text-green-700' : 'text-slate-800'">Lihat Dokumen</span>
-                                                <span class="text-xs" :class="isFileValidated('main_file') ? 'text-green-600' : 'text-slate-500'" x-text="isFileValidated('main_file') ? 'Dokumen Tervalidasi' : 'Klik untuk preview'"></span>
+                                                <span class="text-sm font-bold block" :class="isFileRejected('main_file') ? 'text-red-700' : 'text-slate-800'">Lihat Dokumen</span>
+                                                <span class="text-xs" :class="isFileRejected('main_file') ? 'text-red-600' : 'text-slate-500'" x-text="isFileRejected('main_file') ? 'Berkas Ditolak' : 'Klik untuk preview'"></span>
                                             </div>
                                         </button>
                                     </div>
@@ -662,9 +663,18 @@
                         <button type="button" @click="showFileModal = false" class="px-6 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50 transition-colors">
                             Tutup
                         </button>
-                        <button type="button" @click="validateCurrentFile()" class="px-6 py-2.5 rounded-xl bg-bedas-600 text-white font-bold hover:bg-bedas-700 shadow-lg shadow-bedas-100 transition-colors flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Nyatakan Sesuai
+                        <button type="button" @click="toggleFileReject()" 
+                                class="px-6 py-2.5 rounded-xl text-white font-bold shadow-lg transition-colors flex items-center gap-2"
+                                :class="isFileRejected() ? 'bg-slate-500 hover:bg-slate-600 shadow-slate-200' : 'bg-red-600 hover:bg-red-700 shadow-red-200'">
+                            
+                            <template x-if="isFileRejected()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </template>
+                            <template x-if="!isFileRejected()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </template>
+                            
+                            <span x-text="isFileRejected() ? 'Batalkan Tolak' : 'Tolak Berkas'"></span>
                         </button>
                     </div>
                 </div>
