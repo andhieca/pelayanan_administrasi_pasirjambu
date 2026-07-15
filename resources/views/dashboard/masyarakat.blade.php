@@ -91,6 +91,54 @@
         sanitizeNik(value) {
             return value.replace(/[^0-9]/g, '').substring(0, 16);
         },
+        nikErrors: {},
+        validateNik(nik, fieldKey) {
+            if (!nik || nik.length === 0) {
+                delete this.nikErrors[fieldKey];
+                return;
+            }
+            // Must be exactly 16 digits
+            if (nik.length !== 16) {
+                this.nikErrors[fieldKey] = 'NIK harus tepat 16 digit (' + nik.length + '/16)';
+                return;
+            }
+            // 6 digit pertama: kode wilayah (01-99 untuk masing-masing)
+            const kodeProv = parseInt(nik.substring(0, 2));
+            const kodeKab = parseInt(nik.substring(2, 4));
+            const kodeKec = parseInt(nik.substring(4, 6));
+            if (kodeProv < 1 || kodeProv > 99) {
+                this.nikErrors[fieldKey] = 'Kode provinsi tidak valid (digit 1-2)';
+                return;
+            }
+            if (kodeKab < 1 || kodeKab > 99) {
+                this.nikErrors[fieldKey] = 'Kode kabupaten/kota tidak valid (digit 3-4)';
+                return;
+            }
+            if (kodeKec < 1 || kodeKec > 99) {
+                this.nikErrors[fieldKey] = 'Kode kecamatan tidak valid (digit 5-6)';
+                return;
+            }
+            // 6 digit kedua: tanggal lahir DDMMYY (perempuan DD+40)
+            const tanggal = parseInt(nik.substring(6, 8));
+            const bulan = parseInt(nik.substring(8, 10));
+            // Tanggal: 01-31 (laki-laki) atau 41-71 (perempuan, +40)
+            if (!((tanggal >= 1 && tanggal <= 31) || (tanggal >= 41 && tanggal <= 71))) {
+                this.nikErrors[fieldKey] = 'Tanggal lahir tidak valid (digit 7-8). Laki-laki: 01-31, Perempuan: 41-71';
+                return;
+            }
+            if (bulan < 1 || bulan > 12) {
+                this.nikErrors[fieldKey] = 'Bulan lahir tidak valid (digit 9-10). Harus 01-12';
+                return;
+            }
+            // 4 digit terakhir: nomor urut (0001-9999)
+            const nomorUrut = parseInt(nik.substring(12, 16));
+            if (nomorUrut < 1) {
+                this.nikErrors[fieldKey] = 'Nomor urut tidak valid (digit 13-16). Harus mulai dari 0001';
+                return;
+            }
+            // Valid!
+            delete this.nikErrors[fieldKey];
+        },
         sanitizePhone(value) {
             return value.replace(/[^0-9]/g, '').substring(0, 15);
         },
@@ -168,14 +216,14 @@
                     }
                 }
 
-                // Extra: NIK length
-                if (this.suami.nik && this.suami.nik.length !== 16) {
-                    this.emptyFields['suami.nik'] = 'NIK Suami harus tepat 16 digit';
-                    isValid = false;
+                // Extra: NIK Validation
+                if (this.suami.nik) {
+                    this.validateNik(this.suami.nik, 'suami');
+                    if (this.nikErrors['suami']) isValid = false;
                 }
-                if (this.istri.nik && this.istri.nik.length !== 16) {
-                    this.emptyFields['istri.nik'] = 'NIK Istri harus tepat 16 digit';
-                    isValid = false;
+                if (this.istri.nik) {
+                    this.validateNik(this.istri.nik, 'istri');
+                    if (this.nikErrors['istri']) isValid = false;
                 }
                 // Extra: WhatsApp format
                 if (this.whatsapp && !/^(08|628)[0-9]{8,13}$/.test(this.whatsapp)) {
@@ -202,9 +250,9 @@
                         isValid = false;
                     }
                 }
-                if (this.pemohon.nik && this.pemohon.nik.length !== 16) {
-                    this.emptyFields['pemohon.nik'] = 'NIK Pemohon harus tepat 16 digit';
-                    isValid = false;
+                if (this.pemohon.nik) {
+                    this.validateNik(this.pemohon.nik, 'pemohon');
+                    if (this.nikErrors['pemohon']) isValid = false;
                 }
 
             } else if (this.selectedLayanan === 'Rekomendasi Bantuan') {
@@ -519,9 +567,22 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="text" name="suami[nik]" x-model="suami.nik" @input="suami.nik = sanitizeNik($event.target.value); validateField('suami_nik', suami.nik); emptyFields['suami.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.nik']}" placeholder="16 Digit">
-                                                    <p x-show="suami.nik && suami.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="suami.nik.length"></span>/16)</p>
-                                                    <p x-show="formSubmitted && emptyFields['suami.nik'] && (!suami.nik || suami.nik.length === 16)" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.nik']"></p>
+                                                    <input type="text" name="suami[nik]" x-model="suami.nik" @input="suami.nik = sanitizeNik($event.target.value); validateNik(suami.nik, 'suami'); emptyFields['suami.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm font-mono tracking-wider" :class="{'border-red-500 ring-1 ring-red-500': (formSubmitted && emptyFields['suami.nik']) || nikErrors['suami'], 'border-emerald-500 ring-1 ring-emerald-500': suami.nik && suami.nik.length === 16 && !nikErrors['suami']}" placeholder="Contoh: 3204XXXXDDMMYYXXXX">
+                                                    <!-- Progress bar -->
+                                                    <div x-show="suami.nik && suami.nik.length > 0 && suami.nik.length < 16" class="mt-1">
+                                                        <div class="w-full bg-slate-200 rounded-full h-1">
+                                                            <div class="bg-bedas-500 h-1 rounded-full transition-all" :style="'width:' + (suami.nik.length / 16 * 100) + '%'"></div>
+                                                        </div>
+                                                        <p class="text-[10px] text-slate-400 mt-0.5"><span x-text="suami.nik.length"></span>/16 digit</p>
+                                                    </div>
+                                                    <!-- Format breakdown when 16 digits -->
+                                                    <div x-show="suami.nik && suami.nik.length === 16 && !nikErrors['suami']" class="mt-1 flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + suami.nik.substring(0,2) + '.' + suami.nik.substring(2,4) + '.' + suami.nik.substring(4,6) + ' | Lahir: ' + suami.nik.substring(6,8) + '-' + suami.nik.substring(8,10) + '-' + suami.nik.substring(10,12) + ' | Urut: ' + suami.nik.substring(12,16)"></span></p>
+                                                    </div>
+                                                    <!-- Error messages -->
+                                                    <p x-show="nikErrors['suami']" class="text-xs text-red-500 mt-1 flex items-center gap-1"><svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span x-text="nikErrors['suami']"></span></p>
+                                                    <p x-show="formSubmitted && emptyFields['suami.nik'] && !nikErrors['suami']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.nik']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Bin</label>
@@ -590,9 +651,22 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="text" name="istri[nik]" x-model="istri.nik" @input="istri.nik = sanitizeNik($event.target.value); emptyFields['istri.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.nik']}" placeholder="16 Digit">
-                                                    <p x-show="istri.nik && istri.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="istri.nik.length"></span>/16)</p>
-                                                    <p x-show="formSubmitted && emptyFields['istri.nik'] && (!istri.nik || istri.nik.length === 16)" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.nik']"></p>
+                                                    <input type="text" name="istri[nik]" x-model="istri.nik" @input="istri.nik = sanitizeNik($event.target.value); validateNik(istri.nik, 'istri'); emptyFields['istri.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm font-mono tracking-wider" :class="{'border-red-500 ring-1 ring-red-500': (formSubmitted && emptyFields['istri.nik']) || nikErrors['istri'], 'border-emerald-500 ring-1 ring-emerald-500': istri.nik && istri.nik.length === 16 && !nikErrors['istri']}" placeholder="Contoh: 3204XXXXDDMMYYXXXX">
+                                                    <!-- Progress bar -->
+                                                    <div x-show="istri.nik && istri.nik.length > 0 && istri.nik.length < 16" class="mt-1">
+                                                        <div class="w-full bg-slate-200 rounded-full h-1">
+                                                            <div class="bg-bedas-500 h-1 rounded-full transition-all" :style="'width:' + (istri.nik.length / 16 * 100) + '%'"></div>
+                                                        </div>
+                                                        <p class="text-[10px] text-slate-400 mt-0.5"><span x-text="istri.nik.length"></span>/16 digit</p>
+                                                    </div>
+                                                    <!-- Format breakdown when 16 digits -->
+                                                    <div x-show="istri.nik && istri.nik.length === 16 && !nikErrors['istri']" class="mt-1 flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + istri.nik.substring(0,2) + '.' + istri.nik.substring(2,4) + '.' + istri.nik.substring(4,6) + ' | Lahir: ' + istri.nik.substring(6,8) + '-' + istri.nik.substring(8,10) + '-' + istri.nik.substring(10,12) + ' | Urut: ' + istri.nik.substring(12,16)"></span></p>
+                                                    </div>
+                                                    <!-- Error messages -->
+                                                    <p x-show="nikErrors['istri']" class="text-xs text-red-500 mt-1 flex items-center gap-1"><svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span x-text="nikErrors['istri']"></span></p>
+                                                    <p x-show="formSubmitted && emptyFields['istri.nik'] && !nikErrors['istri']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.nik']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Binti</label>
@@ -774,9 +848,22 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="text" name="pemohon[nik]" x-model="pemohon.nik" @input="pemohon.nik = sanitizeNik($event.target.value); emptyFields['pemohon.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.nik']}" placeholder="16 Digit">
-                                                    <p x-show="pemohon.nik && pemohon.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="pemohon.nik.length"></span>/16)</p>
-                                                    <p x-show="formSubmitted && emptyFields['pemohon.nik'] && (!pemohon.nik || pemohon.nik.length === 16)" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pemohon.nik']"></p>
+                                                    <input type="text" name="pemohon[nik]" x-model="pemohon.nik" @input="pemohon.nik = sanitizeNik($event.target.value); validateNik(pemohon.nik, 'pemohon'); emptyFields['pemohon.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm font-mono tracking-wider" :class="{'border-red-500 ring-1 ring-red-500': (formSubmitted && emptyFields['pemohon.nik']) || nikErrors['pemohon'], 'border-emerald-500 ring-1 ring-emerald-500': pemohon.nik && pemohon.nik.length === 16 && !nikErrors['pemohon']}" placeholder="Contoh: 3204XXXXDDMMYYXXXX">
+                                                    <!-- Progress bar -->
+                                                    <div x-show="pemohon.nik && pemohon.nik.length > 0 && pemohon.nik.length < 16" class="mt-1">
+                                                        <div class="w-full bg-slate-200 rounded-full h-1">
+                                                            <div class="bg-bedas-500 h-1 rounded-full transition-all" :style="'width:' + (pemohon.nik.length / 16 * 100) + '%'"></div>
+                                                        </div>
+                                                        <p class="text-[10px] text-slate-400 mt-0.5"><span x-text="pemohon.nik.length"></span>/16 digit</p>
+                                                    </div>
+                                                    <!-- Format breakdown when 16 digits -->
+                                                    <div x-show="pemohon.nik && pemohon.nik.length === 16 && !nikErrors['pemohon']" class="mt-1 flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + pemohon.nik.substring(0,2) + '.' + pemohon.nik.substring(2,4) + '.' + pemohon.nik.substring(4,6) + ' | Lahir: ' + pemohon.nik.substring(6,8) + '-' + pemohon.nik.substring(8,10) + '-' + pemohon.nik.substring(10,12) + ' | Urut: ' + pemohon.nik.substring(12,16)"></span></p>
+                                                    </div>
+                                                    <!-- Error messages -->
+                                                    <p x-show="nikErrors['pemohon']" class="text-xs text-red-500 mt-1 flex items-center gap-1"><svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span x-text="nikErrors['pemohon']"></span></p>
+                                                    <p x-show="formSubmitted && emptyFields['pemohon.nik'] && !nikErrors['pemohon']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pemohon.nik']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
