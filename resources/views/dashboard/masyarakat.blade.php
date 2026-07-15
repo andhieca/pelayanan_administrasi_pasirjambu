@@ -62,6 +62,8 @@
         alasan: '',
         whatsapp: '',
         validationErrors: {},
+        formSubmitted: false,
+        emptyFields: {},
 
         // Input sanitization helpers
         sanitizeNama(value) {
@@ -92,7 +94,130 @@
             return value.replace(/[^a-zA-Z\s\/\-]/g, '');
         },
 
-        // Validation checker
+        // Check if a field is empty
+        isEmpty(value) {
+            return !value || String(value).trim() === '';
+        },
+
+        // Validate all required fields based on selected layanan
+        validateForm() {
+            this.formSubmitted = true;
+            this.emptyFields = {};
+            let isValid = true;
+
+            if (this.selectedLayanan === 'Dispen Nikah') {
+                // Calon Suami
+                const suamiFields = {
+                    'suami.nama': { value: this.suami.nama, label: 'Nama Suami' },
+                    'suami.nik': { value: this.suami.nik, label: 'NIK Suami' },
+                    'suami.bin': { value: this.suami.bin, label: 'Bin Suami' },
+                    'suami.ttl': { value: this.suami.ttl, label: 'TTL Suami' },
+                    'suami.agama': { value: this.suami.agama, label: 'Agama Suami' },
+                    'suami.pekerjaan': { value: this.suami.pekerjaan, label: 'Pekerjaan Suami' },
+                    'suami.status': { value: this.suami.status, label: 'Status Suami' },
+                    'suami.alamat': { value: this.suami.alamat, label: 'Alamat Suami' },
+                };
+                // Calon Istri
+                const istriFields = {
+                    'istri.nama': { value: this.istri.nama, label: 'Nama Istri' },
+                    'istri.nik': { value: this.istri.nik, label: 'NIK Istri' },
+                    'istri.binti': { value: this.istri.binti, label: 'Binti Istri' },
+                    'istri.ttl': { value: this.istri.ttl, label: 'TTL Istri' },
+                    'istri.agama': { value: this.istri.agama, label: 'Agama Istri' },
+                    'istri.pekerjaan': { value: this.istri.pekerjaan, label: 'Pekerjaan Istri' },
+                    'istri.status': { value: this.istri.status, label: 'Status Istri' },
+                    'istri.alamat': { value: this.istri.alamat, label: 'Alamat Istri' },
+                };
+                // Pernikahan
+                const pernikahanFields = {
+                    'pernikahan.hari': { value: this.pernikahan.hari, label: 'Hari Pernikahan' },
+                    'pernikahan.tanggal': { value: this.pernikahan.tanggal, label: 'Tanggal Pernikahan' },
+                    'pernikahan.waktu': { value: this.pernikahan.waktu, label: 'Waktu Pernikahan' },
+                    'pernikahan.tempat': { value: this.pernikahan.tempat, label: 'Tempat Akad' },
+                };
+                // Lainnya
+                const lainnyaFields = {
+                    'alasan': { value: this.alasan, label: 'Alasan' },
+                    'whatsapp': { value: this.whatsapp, label: 'Nomor WhatsApp' },
+                };
+
+                const allFields = { ...suamiFields, ...istriFields, ...pernikahanFields, ...lainnyaFields };
+                for (const [key, field] of Object.entries(allFields)) {
+                    if (this.isEmpty(field.value)) {
+                        this.emptyFields[key] = field.label + ' wajib diisi';
+                        isValid = false;
+                    }
+                }
+
+                // Extra: NIK length
+                if (this.suami.nik && this.suami.nik.length !== 16) {
+                    this.emptyFields['suami.nik'] = 'NIK Suami harus tepat 16 digit';
+                    isValid = false;
+                }
+                if (this.istri.nik && this.istri.nik.length !== 16) {
+                    this.emptyFields['istri.nik'] = 'NIK Istri harus tepat 16 digit';
+                    isValid = false;
+                }
+                // Extra: WhatsApp format
+                if (this.whatsapp && !/^(08|628)[0-9]{8,13}$/.test(this.whatsapp)) {
+                    this.emptyFields['whatsapp'] = 'Format WhatsApp tidak valid';
+                    isValid = false;
+                }
+
+            } else if (this.selectedLayanan === 'Izin Keramaian') {
+                const fields = {
+                    'pemohon.nama': { value: this.pemohon.nama, label: 'Nama Pemohon' },
+                    'pemohon.nik': { value: this.pemohon.nik, label: 'NIK Pemohon' },
+                    'pemohon.ttl': { value: this.pemohon.ttl, label: 'TTL Pemohon' },
+                    'pemohon.gender': { value: this.pemohon.gender, label: 'Jenis Kelamin' },
+                    'pemohon.pekerjaan': { value: this.pemohon.pekerjaan, label: 'Pekerjaan' },
+                    'pemohon.alamat': { value: this.pemohon.alamat, label: 'Alamat' },
+                    'keramaian.tanggal': { value: this.keramaian.tanggal, label: 'Hari/Tanggal Keramaian' },
+                    'keramaian.acara': { value: this.keramaian.acara, label: 'Acara' },
+                    'keramaian.lokasi': { value: this.keramaian.lokasi, label: 'Lokasi' },
+                    'keramaian.hiburan': { value: this.keramaian.hiburan, label: 'Hiburan' },
+                };
+                for (const [key, field] of Object.entries(fields)) {
+                    if (this.isEmpty(field.value)) {
+                        this.emptyFields[key] = field.label + ' wajib diisi';
+                        isValid = false;
+                    }
+                }
+                if (this.pemohon.nik && this.pemohon.nik.length !== 16) {
+                    this.emptyFields['pemohon.nik'] = 'NIK Pemohon harus tepat 16 digit';
+                    isValid = false;
+                }
+
+            } else if (this.selectedLayanan === 'Rekomendasi Bantuan') {
+                const fields = {
+                    'rekomendasi.jenis_kelompok': { value: this.rekomendasi.jenis_kelompok, label: 'Jenis Kelompok' },
+                    'rekomendasi.nama_kelompok': { value: this.rekomendasi.nama_kelompok, label: 'Nama Kelompok' },
+                    'rekomendasi.alamat': { value: this.rekomendasi.alamat, label: 'Alamat Kelompok' },
+                    'rekomendasi.perihal': { value: this.rekomendasi.perihal, label: 'Perihal' },
+                    'rekomendasi.nama_desa': { value: this.rekomendasi.nama_desa, label: 'Nama Desa' },
+                };
+                for (const [key, field] of Object.entries(fields)) {
+                    if (this.isEmpty(field.value)) {
+                        this.emptyFields[key] = field.label + ' wajib diisi';
+                        isValid = false;
+                    }
+                }
+            }
+
+            // Scroll to first error
+            if (!isValid) {
+                this.$nextTick(() => {
+                    const firstError = document.querySelector('.validation-warning');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+
+            return isValid;
+        },
+
+        // Validation checker (format validation)
         validateField(field, value) {
             let error = '';
             switch(field) {
@@ -320,8 +445,8 @@
                                     </button>
                                 </div>
 
-                                <form
-                                    x-bind:action="isEdit ? '/masyarakat/permohonan/' + editId : '{{ route('masyarakat.store') }}'"
+                                <form :action="isEdit ? '{{ url('dashboard/masyarakat') }}/' + editId : '{{ route('masyarakat.store') }}'" 
+                                    @submit.prevent="isDraftValue == 1 || validateForm() ? $el.submit() : null"
                                     method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <template x-if="isEdit">
@@ -341,25 +466,28 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
-                                                    <input type="text" name="suami[nama]" x-model="suami.nama" @input="suami.nama = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
-                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf, spasi, titik, dan apostrof</p>
+                                                    <input type="text" name="suami[nama]" x-model="suami.nama" @input="suami.nama = sanitizeNama($event.target.value); emptyFields['suami.nama'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.nama']}" placeholder="Sesuai KTP">
+                                                    <p class="text-xs mt-1" :class="formSubmitted && emptyFields['suami.nama'] ? 'text-red-500 validation-warning' : 'text-slate-400'" x-text="formSubmitted && emptyFields['suami.nama'] ? emptyFields['suami.nama'] : 'Hanya huruf, spasi, titik, dan apostrof'"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="text" name="suami[nik]" x-model="suami.nik" @input="suami.nik = sanitizeNik($event.target.value); validateField('suami_nik', suami.nik)" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <input type="text" name="suami[nik]" x-model="suami.nik" @input="suami.nik = sanitizeNik($event.target.value); validateField('suami_nik', suami.nik); emptyFields['suami.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.nik']}" placeholder="16 Digit">
                                                     <p x-show="suami.nik && suami.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="suami.nik.length"></span>/16)</p>
+                                                    <p x-show="formSubmitted && emptyFields['suami.nik'] && (!suami.nik || suami.nik.length === 16)" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.nik']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Bin</label>
-                                                    <input type="text" name="suami[bin]" x-model="suami.bin" @input="suami.bin = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Ayah">
+                                                    <input type="text" name="suami[bin]" x-model="suami.bin" @input="suami.bin = sanitizeNama($event.target.value); emptyFields['suami.bin'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.bin']}" placeholder="Nama Ayah">
+                                                    <p x-show="formSubmitted && emptyFields['suami.bin']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.bin']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
-                                                    <input type="text" name="suami[ttl]" x-model="suami.ttl" @input="suami.ttl = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1995">
+                                                    <input type="text" name="suami[ttl]" x-model="suami.ttl" @input="suami.ttl = sanitizeTtl($event.target.value); emptyFields['suami.ttl'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.ttl']}" placeholder="Contoh: Bandung, 12 Januari 1995">
+                                                    <p x-show="formSubmitted && emptyFields['suami.ttl']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.ttl']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Agama</label>
-                                                    <select name="suami[agama]" x-model="suami.agama" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <select name="suami[agama]" x-model="suami.agama" @change="emptyFields['suami.agama'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.agama']}">
                                                         <option value="">Pilih Agama</option>
                                                         <option value="Islam">Islam</option>
                                                         <option value="Kristen">Kristen</option>
@@ -368,24 +496,30 @@
                                                         <option value="Buddha">Buddha</option>
                                                         <option value="Konghucu">Konghucu</option>
                                                     </select>
+                                                    <p x-show="formSubmitted && emptyFields['suami.agama']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.agama']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Pekerjaan</label>
-                                                    <input type="text" name="suami[pekerjaan]" x-model="suami.pekerjaan" @input="suami.pekerjaan = sanitizePekerjaan($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
+                                                    <input type="text" name="suami[pekerjaan]" x-model="suami.pekerjaan" @input="suami.pekerjaan = sanitizePekerjaan($event.target.value); emptyFields['suami.pekerjaan'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.pekerjaan']}" placeholder="Pekerjaan saat ini">
+                                                    <p x-show="formSubmitted && emptyFields['suami.pekerjaan']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.pekerjaan']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Status</label>
-                                                    <select name="suami[status]" x-model="suami.status" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <select name="suami[status]" x-model="suami.status" @change="emptyFields['suami.status'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.status']}">
                                                         <option value="">Pilih Status</option>
                                                         <option value="Belum Kawin">Belum Kawin</option>
                                                         <option value="Duda (Cerai Hidup)">Duda (Cerai Hidup)</option>
                                                         <option value="Duda (Cerai Mati)">Duda (Cerai Mati)</option>
                                                     </select>
+                                                    <p x-show="formSubmitted && emptyFields['suami.status']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['suami.status']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat</label>
-                                                    <textarea name="suami[alamat]" x-model="suami.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
-                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="suami.alamat.length"></span>/500 karakter</p>
+                                                    <textarea name="suami[alamat]" x-model="suami.alamat" @input="emptyFields['suami.alamat'] = null" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['suami.alamat']}" placeholder="Alamat Lengkap"></textarea>
+                                                    <div class="flex justify-between items-center mt-1">
+                                                        <p x-show="formSubmitted && emptyFields['suami.alamat']" class="text-xs text-red-500 validation-warning" x-text="emptyFields['suami.alamat']"></p>
+                                                        <p class="text-xs text-slate-400" :class="{'ml-auto': !(formSubmitted && emptyFields['suami.alamat'])}"><span x-text="suami.alamat.length"></span>/500 karakter</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -399,25 +533,28 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
-                                                    <input type="text" name="istri[nama]" x-model="istri.nama" @input="istri.nama = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
-                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf, spasi, titik, dan apostrof</p>
+                                                    <input type="text" name="istri[nama]" x-model="istri.nama" @input="istri.nama = sanitizeNama($event.target.value); emptyFields['istri.nama'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.nama']}" placeholder="Sesuai KTP">
+                                                    <p class="text-xs mt-1" :class="formSubmitted && emptyFields['istri.nama'] ? 'text-red-500 validation-warning' : 'text-slate-400'" x-text="formSubmitted && emptyFields['istri.nama'] ? emptyFields['istri.nama'] : 'Hanya huruf, spasi, titik, dan apostrof'"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="text" name="istri[nik]" x-model="istri.nik" @input="istri.nik = sanitizeNik($event.target.value)" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <input type="text" name="istri[nik]" x-model="istri.nik" @input="istri.nik = sanitizeNik($event.target.value); emptyFields['istri.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.nik']}" placeholder="16 Digit">
                                                     <p x-show="istri.nik && istri.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="istri.nik.length"></span>/16)</p>
+                                                    <p x-show="formSubmitted && emptyFields['istri.nik'] && (!istri.nik || istri.nik.length === 16)" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.nik']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Binti</label>
-                                                    <input type="text" name="istri[binti]" x-model="istri.binti" @input="istri.binti = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Ayah">
+                                                    <input type="text" name="istri[binti]" x-model="istri.binti" @input="istri.binti = sanitizeNama($event.target.value); emptyFields['istri.binti'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.binti']}" placeholder="Nama Ayah">
+                                                    <p x-show="formSubmitted && emptyFields['istri.binti']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.binti']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
-                                                    <input type="text" name="istri[ttl]" x-model="istri.ttl" @input="istri.ttl = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1995">
+                                                    <input type="text" name="istri[ttl]" x-model="istri.ttl" @input="istri.ttl = sanitizeTtl($event.target.value); emptyFields['istri.ttl'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.ttl']}" placeholder="Contoh: Bandung, 12 Januari 1995">
+                                                    <p x-show="formSubmitted && emptyFields['istri.ttl']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.ttl']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Agama</label>
-                                                    <select name="istri[agama]" x-model="istri.agama" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <select name="istri[agama]" x-model="istri.agama" @change="emptyFields['istri.agama'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.agama']}">
                                                         <option value="">Pilih Agama</option>
                                                         <option value="Islam">Islam</option>
                                                         <option value="Kristen">Kristen</option>
@@ -426,24 +563,30 @@
                                                         <option value="Buddha">Buddha</option>
                                                         <option value="Konghucu">Konghucu</option>
                                                     </select>
+                                                    <p x-show="formSubmitted && emptyFields['istri.agama']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.agama']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Pekerjaan</label>
-                                                    <input type="text" name="istri[pekerjaan]" x-model="istri.pekerjaan" @input="istri.pekerjaan = sanitizePekerjaan($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
+                                                    <input type="text" name="istri[pekerjaan]" x-model="istri.pekerjaan" @input="istri.pekerjaan = sanitizePekerjaan($event.target.value); emptyFields['istri.pekerjaan'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.pekerjaan']}" placeholder="Pekerjaan saat ini">
+                                                    <p x-show="formSubmitted && emptyFields['istri.pekerjaan']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.pekerjaan']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Status</label>
-                                                    <select name="istri[status]" x-model="istri.status" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <select name="istri[status]" x-model="istri.status" @change="emptyFields['istri.status'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.status']}">
                                                         <option value="">Pilih Status</option>
                                                         <option value="Belum Kawin">Belum Kawin</option>
                                                         <option value="Janda (Cerai Hidup)">Janda (Cerai Hidup)</option>
                                                         <option value="Janda (Cerai Mati)">Janda (Cerai Mati)</option>
                                                     </select>
+                                                    <p x-show="formSubmitted && emptyFields['istri.status']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['istri.status']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat</label>
-                                                    <textarea name="istri[alamat]" x-model="istri.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
-                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="istri.alamat.length"></span>/500 karakter</p>
+                                                    <textarea name="istri[alamat]" x-model="istri.alamat" @input="emptyFields['istri.alamat'] = null" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['istri.alamat']}" placeholder="Alamat Lengkap"></textarea>
+                                                    <div class="flex justify-between items-center mt-1">
+                                                        <p x-show="formSubmitted && emptyFields['istri.alamat']" class="text-xs text-red-500 validation-warning" x-text="emptyFields['istri.alamat']"></p>
+                                                        <p class="text-xs text-slate-400" :class="{'ml-auto': !(formSubmitted && emptyFields['istri.alamat'])}"><span x-text="istri.alamat.length"></span>/500 karakter</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -457,7 +600,7 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hari</label>
-                                                    <select name="pernikahan[hari]" x-model="pernikahan.hari" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <select name="pernikahan[hari]" x-model="pernikahan.hari" @change="emptyFields['pernikahan.hari'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.hari']}">
                                                         <option value="">Pilih Hari</option>
                                                         <option value="Senin">Senin</option>
                                                         <option value="Selasa">Selasa</option>
@@ -467,18 +610,22 @@
                                                         <option value="Sabtu">Sabtu</option>
                                                         <option value="Minggu">Minggu</option>
                                                     </select>
+                                                    <p x-show="formSubmitted && emptyFields['pernikahan.hari']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pernikahan.hari']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tanggal</label>
-                                                    <input type="date" name="pernikahan[tanggal]" x-model="pernikahan.tanggal" min="{{ date('Y-m-d') }}" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <input type="date" name="pernikahan[tanggal]" x-model="pernikahan.tanggal" @input="emptyFields['pernikahan.tanggal'] = null" min="{{ date('Y-m-d') }}" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.tanggal']}">
+                                                    <p x-show="formSubmitted && emptyFields['pernikahan.tanggal']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pernikahan.tanggal']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Waktu</label>
-                                                    <input type="time" name="pernikahan[waktu]" x-model="pernikahan.waktu" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <input type="time" name="pernikahan[waktu]" x-model="pernikahan.waktu" @input="emptyFields['pernikahan.waktu'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.waktu']}">
+                                                    <p x-show="formSubmitted && emptyFields['pernikahan.waktu']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pernikahan.waktu']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat Akad</label>
-                                                    <input type="text" name="pernikahan[tempat]" x-model="pernikahan.tempat" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Masjid / Alamat">
+                                                    <input type="text" name="pernikahan[tempat]" x-model="pernikahan.tempat" @input="emptyFields['pernikahan.tempat'] = null" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pernikahan.tempat']}" placeholder="Nama Masjid / Alamat">
+                                                    <p x-show="formSubmitted && emptyFields['pernikahan.tempat']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pernikahan.tempat']"></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -492,13 +639,17 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alasan Mengajukan Dispen Nikah</label>
-                                                    <textarea name="alasan" x-model="alasan" rows="3" maxlength="1000" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Jelaskan alasan pengajuan..."></textarea>
-                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="alasan.length"></span>/1000 karakter</p>
+                                                    <textarea name="alasan" x-model="alasan" @input="emptyFields['alasan'] = null" rows="3" maxlength="1000" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['alasan']}" placeholder="Jelaskan alasan pengajuan..."></textarea>
+                                                    <div class="flex justify-between items-center mt-1">
+                                                        <p x-show="formSubmitted && emptyFields['alasan']" class="text-xs text-red-500 validation-warning" x-text="emptyFields['alasan']"></p>
+                                                        <p class="text-xs text-slate-400" :class="{'ml-auto': !(formSubmitted && emptyFields['alasan'])}"><span x-text="alasan.length"></span>/1000 karakter</p>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nomor WhatsApp</label>
-                                                    <input type="text" name="whatsapp" x-model="whatsapp" @input="whatsapp = sanitizePhone($event.target.value)" maxlength="15" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="08xxxxxxxxxx">
+                                                    <input type="text" name="whatsapp" x-model="whatsapp" @input="whatsapp = sanitizePhone($event.target.value); emptyFields['whatsapp'] = null" maxlength="15" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['whatsapp']}" placeholder="08xxxxxxxxxx">
                                                     <p x-show="whatsapp && !/^(08|628)[0-9]{8,13}$/.test(whatsapp)" class="text-xs text-red-500 mt-1">Format: 08xxxxxxxxxx atau 628xxxxxxxxxx</p>
+                                                    <p x-show="formSubmitted && emptyFields['whatsapp'] && (!whatsapp || /^(08|628)[0-9]{8,13}$/.test(whatsapp))" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['whatsapp']"></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -555,34 +706,41 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
-                                                    <input type="text" name="pemohon[nama]" x-model="pemohon.nama" @input="pemohon.nama = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
-                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf, spasi, titik, dan apostrof</p>
+                                                    <input type="text" name="pemohon[nama]" x-model="pemohon.nama" @input="pemohon.nama = sanitizeNama($event.target.value); emptyFields['pemohon.nama'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.nama']}" placeholder="Sesuai KTP">
+                                                    <p class="text-xs mt-1" :class="formSubmitted && emptyFields['pemohon.nama'] ? 'text-red-500 validation-warning' : 'text-slate-400'" x-text="formSubmitted && emptyFields['pemohon.nama'] ? emptyFields['pemohon.nama'] : 'Hanya huruf, spasi, titik, dan apostrof'"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="text" name="pemohon[nik]" x-model="pemohon.nik" @input="pemohon.nik = sanitizeNik($event.target.value)" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <input type="text" name="pemohon[nik]" x-model="pemohon.nik" @input="pemohon.nik = sanitizeNik($event.target.value); emptyFields['pemohon.nik'] = null" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.nik']}" placeholder="16 Digit">
                                                     <p x-show="pemohon.nik && pemohon.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="pemohon.nik.length"></span>/16)</p>
+                                                    <p x-show="formSubmitted && emptyFields['pemohon.nik'] && (!pemohon.nik || pemohon.nik.length === 16)" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pemohon.nik']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
-                                                    <input type="text" name="pemohon[ttl]" x-model="pemohon.ttl" @input="pemohon.ttl = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1990">
+                                                    <input type="text" name="pemohon[ttl]" x-model="pemohon.ttl" @input="pemohon.ttl = sanitizeTtl($event.target.value); emptyFields['pemohon.ttl'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.ttl']}" placeholder="Contoh: Bandung, 12 Januari 1990">
+                                                    <p x-show="formSubmitted && emptyFields['pemohon.ttl']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pemohon.ttl']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Jenis Kelamin</label>
-                                                    <select name="pemohon[gender]" x-model="pemohon.gender" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <select name="pemohon[gender]" x-model="pemohon.gender" @change="emptyFields['pemohon.gender'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.gender']}">
                                                         <option value="">Pilih Jenis Kelamin</option>
                                                         <option value="Laki-laki">Laki-laki</option>
                                                         <option value="Perempuan">Perempuan</option>
                                                     </select>
+                                                    <p x-show="formSubmitted && emptyFields['pemohon.gender']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pemohon.gender']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Pekerjaan</label>
-                                                    <input type="text" name="pemohon[pekerjaan]" x-model="pemohon.pekerjaan" @input="pemohon.pekerjaan = sanitizePekerjaan($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
+                                                    <input type="text" name="pemohon[pekerjaan]" x-model="pemohon.pekerjaan" @input="pemohon.pekerjaan = sanitizePekerjaan($event.target.value); emptyFields['pemohon.pekerjaan'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.pekerjaan']}" placeholder="Pekerjaan saat ini">
+                                                    <p x-show="formSubmitted && emptyFields['pemohon.pekerjaan']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['pemohon.pekerjaan']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat</label>
-                                                    <textarea name="pemohon[alamat]" x-model="pemohon.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
-                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="pemohon.alamat.length"></span>/500 karakter</p>
+                                                    <textarea name="pemohon[alamat]" x-model="pemohon.alamat" @input="emptyFields['pemohon.alamat'] = null" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['pemohon.alamat']}" placeholder="Alamat Lengkap"></textarea>
+                                                    <div class="flex justify-between items-center mt-1">
+                                                        <p x-show="formSubmitted && emptyFields['pemohon.alamat']" class="text-xs text-red-500 validation-warning" x-text="emptyFields['pemohon.alamat']"></p>
+                                                        <p class="text-xs text-slate-400" :class="{'ml-auto': !(formSubmitted && emptyFields['pemohon.alamat'])}"><span x-text="pemohon.alamat.length"></span>/500 karakter</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -590,25 +748,29 @@
                                         <!-- Detail Keramaian -->
                                         <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                                             <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                                <span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-sm">🎉</span>
+                                                <span class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center text-sm">🎉</span>
                                                 Maksud Mengadakan Keramaian
                                             </h4>
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hari / Tanggal</label>
-                                                    <input type="text" name="keramaian[tanggal]" x-model="keramaian.tanggal" @input="keramaian.tanggal = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Sabtu, 1 Februari 2026">
+                                                    <input type="text" name="keramaian[tanggal]" x-model="keramaian.tanggal" @input="keramaian.tanggal = sanitizeTtl($event.target.value); emptyFields['keramaian.tanggal'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['keramaian.tanggal']}" placeholder="Contoh: Sabtu, 1 Februari 2026">
+                                                    <p x-show="formSubmitted && emptyFields['keramaian.tanggal']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['keramaian.tanggal']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Acara</label>
-                                                    <input type="text" name="keramaian[acara]" x-model="keramaian.acara" @input="keramaian.acara = sanitizeAcara($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Pernikahan / Khitanan">
+                                                    <input type="text" name="keramaian[acara]" x-model="keramaian.acara" @input="keramaian.acara = sanitizeAcara($event.target.value); emptyFields['keramaian.acara'] = null" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['keramaian.acara']}" placeholder="Contoh: Pernikahan / Khitanan">
+                                                    <p x-show="formSubmitted && emptyFields['keramaian.acara']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['keramaian.acara']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Lokasi</label>
-                                                    <input type="text" name="keramaian[lokasi]" x-model="keramaian.lokasi" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Lokasi Lengkap Acara">
+                                                    <input type="text" name="keramaian[lokasi]" x-model="keramaian.lokasi" @input="emptyFields['keramaian.lokasi'] = null" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['keramaian.lokasi']}" placeholder="Lokasi Lengkap Acara">
+                                                    <p x-show="formSubmitted && emptyFields['keramaian.lokasi']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['keramaian.lokasi']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hiburan</label>
-                                                    <input type="text" name="keramaian[hiburan]" x-model="keramaian.hiburan" @input="keramaian.hiburan = sanitizeAcara($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Orgen Tunggal / Wayang Golek">
+                                                    <input type="text" name="keramaian[hiburan]" x-model="keramaian.hiburan" @input="keramaian.hiburan = sanitizeAcara($event.target.value); emptyFields['keramaian.hiburan'] = null" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['keramaian.hiburan']}" placeholder="Contoh: Orgen Tunggal / Wayang Golek">
+                                                    <p x-show="formSubmitted && emptyFields['keramaian.hiburan']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['keramaian.hiburan']"></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -655,25 +817,31 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Jenis Kelompok</label>
-                                                    <input type="text" name="rekomendasi[jenis_kelompok]" x-model="rekomendasi.jenis_kelompok" @input="rekomendasi.jenis_kelompok = sanitizeJenisKelompok($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Kelompok Tani">
+                                                    <input type="text" name="rekomendasi[jenis_kelompok]" x-model="rekomendasi.jenis_kelompok" @input="rekomendasi.jenis_kelompok = sanitizeJenisKelompok($event.target.value); emptyFields['rekomendasi.jenis_kelompok'] = null" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.jenis_kelompok']}" placeholder="Contoh: Kelompok Tani">
+                                                    <p x-show="formSubmitted && emptyFields['rekomendasi.jenis_kelompok']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['rekomendasi.jenis_kelompok']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Kelompok</label>
-                                                    <input type="text" name="rekomendasi[nama_kelompok]" x-model="rekomendasi.nama_kelompok" @input="rekomendasi.nama_kelompok = sanitizeNamaKelompok($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Kelompok">
+                                                    <input type="text" name="rekomendasi[nama_kelompok]" x-model="rekomendasi.nama_kelompok" @input="rekomendasi.nama_kelompok = sanitizeNamaKelompok($event.target.value); emptyFields['rekomendasi.nama_kelompok'] = null" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.nama_kelompok']}" placeholder="Nama Kelompok">
+                                                    <p x-show="formSubmitted && emptyFields['rekomendasi.nama_kelompok']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['rekomendasi.nama_kelompok']"></p>
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat Lengkap</label>
-                                                    <textarea name="rekomendasi[alamat]" x-model="rekomendasi.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Kelompok"></textarea>
-                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="rekomendasi.alamat.length"></span>/500 karakter</p>
+                                                    <textarea name="rekomendasi[alamat]" x-model="rekomendasi.alamat" @input="emptyFields['rekomendasi.alamat'] = null" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.alamat']}" placeholder="Alamat Kelompok"></textarea>
+                                                    <div class="flex justify-between items-center mt-1">
+                                                        <p x-show="formSubmitted && emptyFields['rekomendasi.alamat']" class="text-xs text-red-500 validation-warning" x-text="emptyFields['rekomendasi.alamat']"></p>
+                                                        <p class="text-xs text-slate-400" :class="{'ml-auto': !(formSubmitted && emptyFields['rekomendasi.alamat'])}"><span x-text="rekomendasi.alamat.length"></span>/500 karakter</p>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Perihal</label>
-                                                    <input type="text" name="rekomendasi[perihal]" x-model="rekomendasi.perihal" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Perihal Bantuan">
+                                                    <input type="text" name="rekomendasi[perihal]" x-model="rekomendasi.perihal" @input="emptyFields['rekomendasi.perihal'] = null" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.perihal']}" placeholder="Perihal Bantuan">
+                                                    <p x-show="formSubmitted && emptyFields['rekomendasi.perihal']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['rekomendasi.perihal']"></p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Desa</label>
-                                                    <input type="text" name="rekomendasi[nama_desa]" x-model="rekomendasi.nama_desa" @input="rekomendasi.nama_desa = sanitizeNamaDesa($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Desa">
-                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf dan spasi</p>
+                                                    <input type="text" name="rekomendasi[nama_desa]" x-model="rekomendasi.nama_desa" @input="rekomendasi.nama_desa = sanitizeNamaDesa($event.target.value); emptyFields['rekomendasi.nama_desa'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.nama_desa']}" placeholder="Nama Desa">
+                                                    <p class="text-xs mt-1" :class="formSubmitted && emptyFields['rekomendasi.nama_desa'] ? 'text-red-500 validation-warning' : 'text-slate-400'" x-text="formSubmitted && emptyFields['rekomendasi.nama_desa'] ? emptyFields['rekomendasi.nama_desa'] : 'Hanya huruf dan spasi'"></p>
                                                 </div>
                                             </div>
                                         </div>
