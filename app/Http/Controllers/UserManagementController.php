@@ -28,12 +28,19 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'nullable|string|max:20',
-            'nip' => 'nullable|string|max:50',
+            'phone' => ['nullable', 'string', 'max:15', 'regex:/^(08|628)[0-9]{8,13}$/'],
+            'nip' => ['nullable', 'string', 'max:18', 'regex:/^[0-9]+$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:masyarakat,petugas,camat',
+        ], [
+            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, dan titik.',
+            'name.max' => 'Nama maksimal 100 karakter.',
+            'phone.regex' => 'Nomor telepon tidak valid (contoh: 08xxxxxxxxxx).',
+            'nip.regex' => 'NIP hanya boleh mengandung angka.',
+            'nip.max' => 'NIP maksimal 18 karakter.',
+            'role.in' => 'Role yang dipilih tidak valid.',
         ]);
 
         User::create([
@@ -62,12 +69,18 @@ class UserManagementController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'nip' => 'nullable|string|max:50',
+            'phone' => ['nullable', 'string', 'max:15', 'regex:/^(08|628)[0-9]{8,13}$/'],
+            'nip' => ['nullable', 'string', 'max:18', 'regex:/^[0-9]+$/'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'is_active' => 'nullable|boolean',
+        ], [
+            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, dan titik.',
+            'name.max' => 'Nama maksimal 100 karakter.',
+            'phone.regex' => 'Nomor telepon tidak valid (contoh: 08xxxxxxxxxx).',
+            'nip.regex' => 'NIP hanya boleh mengandung angka.',
+            'nip.max' => 'NIP maksimal 18 karakter.',
         ]);
 
         $data = [

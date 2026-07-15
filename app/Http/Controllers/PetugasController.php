@@ -30,7 +30,10 @@ class PetugasController extends Controller
     {
         $request->validate([
             'action' => 'required|in:approve,reject',
-            'keterangan' => 'required_if:action,reject',
+            'keterangan' => 'required_if:action,reject|nullable|string|max:500',
+        ], [
+            'keterangan.required_if' => 'Keterangan wajib diisi jika menolak permohonan.',
+            'keterangan.max' => 'Keterangan maksimal 500 karakter.',
         ]);
 
         $permohonan = Permohonan::findOrFail($id);
@@ -70,7 +73,10 @@ class PetugasController extends Controller
     public function nomorSurat(Request $request, $id)
     {
         $request->validate([
-            'nomor_surat' => 'required|string',
+            'nomor_surat' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z0-9\s\/\.\-]+$/'],
+        ], [
+            'nomor_surat.regex' => 'Nomor surat hanya boleh mengandung huruf, angka, spasi, garis miring, titik, dan strip.',
+            'nomor_surat.max' => 'Nomor surat maksimal 100 karakter.',
         ]);
 
         $permohonan = Permohonan::findOrFail($id);

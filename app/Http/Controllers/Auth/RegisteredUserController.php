@@ -31,10 +31,15 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:15', 'regex:/^(08|628)[0-9]{8,13}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, dan titik.',
+            'name.max' => 'Nama maksimal 100 karakter.',
+            'phone.regex' => 'Nomor telepon tidak valid (contoh: 08xxxxxxxxxx).',
+            'phone.max' => 'Nomor telepon maksimal 15 karakter.',
         ]);
 
         if ($validator->fails()) {

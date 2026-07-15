@@ -57,7 +57,10 @@ class CamatController extends Controller
     {
         $request->validate([
             'action' => 'required|in:approve,reject',
-            'keterangan' => 'required_if:action,reject',
+            'keterangan' => 'required_if:action,reject|nullable|string|max:500',
+        ], [
+            'keterangan.required_if' => 'Keterangan wajib diisi jika menolak permohonan.',
+            'keterangan.max' => 'Keterangan maksimal 500 karakter.',
         ]);
 
         $permohonan = Permohonan::findOrFail($id);

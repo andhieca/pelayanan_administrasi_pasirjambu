@@ -29,37 +29,39 @@ class MasyarakatController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'jenis_layanan' => 'required',
+            'jenis_layanan' => 'required|in:Dispen Nikah,Izin Keramaian,Rekomendasi Bantuan',
             'berkas' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ], [
+            'jenis_layanan.in' => 'Jenis layanan yang dipilih tidak valid.',
         ]);
 
         if ($request->jenis_layanan == 'Dispen Nikah' && !$request->has('is_draft')) {
             $request->validate([
-                'suami.nama' => 'required|string',
-                'suami.nik' => 'required|numeric',
-                'suami.bin' => 'required|string',
-                'suami.ttl' => 'required|string',
-                'suami.agama' => 'required|string',
-                'suami.pekerjaan' => 'required|string',
-                'suami.status' => 'required|string',
-                'suami.alamat' => 'required|string',
+                'suami.nama' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'suami.nik' => 'required|digits:16',
+                'suami.bin' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'suami.ttl' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s,0-9]+$/'],
+                'suami.agama' => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
+                'suami.pekerjaan' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\/\-]+$/'],
+                'suami.status' => 'required|in:Belum Kawin,Duda (Cerai Hidup),Duda (Cerai Mati)',
+                'suami.alamat' => 'required|string|max:500',
 
-                'istri.nama' => 'required|string',
-                'istri.nik' => 'required|numeric',
-                'istri.binti' => 'required|string',
-                'istri.ttl' => 'required|string',
-                'istri.agama' => 'required|string',
-                'istri.pekerjaan' => 'required|string',
-                'istri.status' => 'required|string',
-                'istri.alamat' => 'required|string',
+                'istri.nama' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'istri.nik' => 'required|digits:16',
+                'istri.binti' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'istri.ttl' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s,0-9]+$/'],
+                'istri.agama' => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
+                'istri.pekerjaan' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\/\-]+$/'],
+                'istri.status' => 'required|in:Belum Kawin,Janda (Cerai Hidup),Janda (Cerai Mati)',
+                'istri.alamat' => 'required|string|max:500',
 
-                'pernikahan.hari' => 'required|string',
-                'pernikahan.tanggal' => 'required|date',
-                'pernikahan.waktu' => 'required|string',
-                'pernikahan.tempat' => 'required|string',
+                'pernikahan.hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+                'pernikahan.tanggal' => 'required|date|after_or_equal:today',
+                'pernikahan.waktu' => 'required|date_format:H:i',
+                'pernikahan.tempat' => 'required|string|max:200',
 
-                'alasan' => 'required|string',
-                'whatsapp' => 'required|numeric',
+                'alasan' => 'required|string|max:1000',
+                'whatsapp' => ['required', 'string', 'regex:/^(08|628)[0-9]{8,13}$/'],
 
                 'files.ktp_suami' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'files.ktp_istri' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
@@ -71,34 +73,79 @@ class MasyarakatController extends Controller
                 'files.n2' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'files.n4' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'files.n10' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ], [
+                'suami.nama.regex' => 'Nama suami hanya boleh mengandung huruf, spasi, dan titik.',
+                'suami.nama.max' => 'Nama suami maksimal 100 karakter.',
+                'suami.nik.digits' => 'NIK suami harus tepat 16 digit angka.',
+                'suami.bin.regex' => 'Nama ayah (bin) hanya boleh mengandung huruf, spasi, dan titik.',
+                'suami.ttl.regex' => 'Tempat, tanggal lahir hanya boleh mengandung huruf, angka, spasi, dan koma.',
+                'suami.agama.in' => 'Agama suami yang dipilih tidak valid.',
+                'suami.pekerjaan.regex' => 'Pekerjaan suami hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
+                'suami.status.in' => 'Status suami yang dipilih tidak valid.',
+                'suami.alamat.max' => 'Alamat suami maksimal 500 karakter.',
+                'istri.nama.regex' => 'Nama istri hanya boleh mengandung huruf, spasi, dan titik.',
+                'istri.nama.max' => 'Nama istri maksimal 100 karakter.',
+                'istri.nik.digits' => 'NIK istri harus tepat 16 digit angka.',
+                'istri.binti.regex' => 'Nama ayah (binti) hanya boleh mengandung huruf, spasi, dan titik.',
+                'istri.ttl.regex' => 'Tempat, tanggal lahir hanya boleh mengandung huruf, angka, spasi, dan koma.',
+                'istri.agama.in' => 'Agama istri yang dipilih tidak valid.',
+                'istri.pekerjaan.regex' => 'Pekerjaan istri hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
+                'istri.status.in' => 'Status istri yang dipilih tidak valid.',
+                'istri.alamat.max' => 'Alamat istri maksimal 500 karakter.',
+                'pernikahan.hari.in' => 'Hari yang dipilih tidak valid.',
+                'pernikahan.tanggal.after_or_equal' => 'Tanggal pernikahan harus hari ini atau setelahnya.',
+                'pernikahan.waktu.date_format' => 'Format waktu harus HH:MM (contoh: 08:00).',
+                'pernikahan.tempat.max' => 'Tempat akad maksimal 200 karakter.',
+                'alasan.max' => 'Alasan maksimal 1000 karakter.',
+                'whatsapp.regex' => 'Nomor WhatsApp tidak valid (contoh: 08xxxxxxxxxx).',
             ]);
         }
 
         if ($request->jenis_layanan == 'Izin Keramaian' && !$request->has('is_draft')) {
             $request->validate([
-                'pemohon.nama' => 'required|string',
-                'pemohon.ttl' => 'required|string',
-                'pemohon.gender' => 'required|string',
-                'pemohon.nik' => 'required|numeric',
-                'pemohon.pekerjaan' => 'required|string',
-                'pemohon.alamat' => 'required|string',
-                'keramaian.tanggal' => 'required|string',
-                'keramaian.acara' => 'required|string',
-                'keramaian.lokasi' => 'required|string',
-                'keramaian.hiburan' => 'required|string',
+                'pemohon.nama' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'pemohon.ttl' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s,0-9]+$/'],
+                'pemohon.gender' => 'required|in:Laki-laki,Perempuan',
+                'pemohon.nik' => 'required|digits:16',
+                'pemohon.pekerjaan' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\/\-]+$/'],
+                'pemohon.alamat' => 'required|string|max:500',
+                'keramaian.tanggal' => 'required|string|max:100',
+                'keramaian.acara' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z\s\/\-]+$/'],
+                'keramaian.lokasi' => 'required|string|max:500',
+                'keramaian.hiburan' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z\s\/\-]+$/'],
                 'files.ktp' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'files.proposal_acara' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ], [
+                'pemohon.nama.regex' => 'Nama pemohon hanya boleh mengandung huruf, spasi, dan titik.',
+                'pemohon.nama.max' => 'Nama pemohon maksimal 100 karakter.',
+                'pemohon.ttl.regex' => 'Tempat, tanggal lahir hanya boleh mengandung huruf, angka, spasi, dan koma.',
+                'pemohon.gender.in' => 'Jenis kelamin yang dipilih tidak valid.',
+                'pemohon.nik.digits' => 'NIK pemohon harus tepat 16 digit angka.',
+                'pemohon.pekerjaan.regex' => 'Pekerjaan hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
+                'pemohon.alamat.max' => 'Alamat maksimal 500 karakter.',
+                'keramaian.acara.regex' => 'Nama acara hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
+                'keramaian.lokasi.max' => 'Lokasi maksimal 500 karakter.',
+                'keramaian.hiburan.regex' => 'Hiburan hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
             ]);
         }
 
         if ($request->jenis_layanan == 'Rekomendasi Bantuan' && !$request->has('is_draft')) {
             $request->validate([
-                'rekomendasi.jenis_kelompok' => 'required|string',
-                'rekomendasi.nama_kelompok' => 'required|string',
-                'rekomendasi.alamat' => 'required|string',
-                'rekomendasi.perihal' => 'required|string',
-                'rekomendasi.nama_desa' => 'required|string',
+                'rekomendasi.jenis_kelompok' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z\s\/\-]+$/'],
+                'rekomendasi.nama_kelompok' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z0-9\s\.\-]+$/'],
+                'rekomendasi.alamat' => 'required|string|max:500',
+                'rekomendasi.perihal' => 'required|string|max:500',
+                'rekomendasi.nama_desa' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s]+$/'],
                 'files.proposal' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ], [
+                'rekomendasi.jenis_kelompok.regex' => 'Jenis kelompok hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
+                'rekomendasi.jenis_kelompok.max' => 'Jenis kelompok maksimal 200 karakter.',
+                'rekomendasi.nama_kelompok.regex' => 'Nama kelompok hanya boleh mengandung huruf, angka, spasi, titik, dan strip.',
+                'rekomendasi.nama_kelompok.max' => 'Nama kelompok maksimal 200 karakter.',
+                'rekomendasi.alamat.max' => 'Alamat maksimal 500 karakter.',
+                'rekomendasi.perihal.max' => 'Perihal maksimal 500 karakter.',
+                'rekomendasi.nama_desa.regex' => 'Nama desa hanya boleh mengandung huruf dan spasi.',
+                'rekomendasi.nama_desa.max' => 'Nama desa maksimal 100 karakter.',
             ]);
         }
 
@@ -208,39 +255,55 @@ class MasyarakatController extends Controller
         $is_draft = $request->has('is_draft') && $request->is_draft;
 
         $request->validate([
-            'jenis_layanan' => 'required',
+            'jenis_layanan' => 'required|in:Dispen Nikah,Izin Keramaian,Rekomendasi Bantuan',
             'berkas' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ], [
+            'jenis_layanan.in' => 'Jenis layanan yang dipilih tidak valid.',
         ]);
 
         if ($request->jenis_layanan == 'Dispen Nikah' && !$is_draft) {
             $request->validate([
-                'suami.nama' => 'required|string',
-                'suami.nik' => 'required|numeric',
-                'istri.nama' => 'required|string',
-                'istri.nik' => 'required|numeric',
-                'suami.bin' => 'required|string',
-                'pernikahan.tanggal' => 'required|date',
+                'suami.nama' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'suami.nik' => 'required|digits:16',
+                'istri.nama' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'istri.nik' => 'required|digits:16',
+                'suami.bin' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'pernikahan.tanggal' => 'required|date|after_or_equal:today',
                 'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ], [
+                'suami.nama.regex' => 'Nama suami hanya boleh mengandung huruf, spasi, dan titik.',
+                'suami.nik.digits' => 'NIK suami harus tepat 16 digit angka.',
+                'istri.nama.regex' => 'Nama istri hanya boleh mengandung huruf, spasi, dan titik.',
+                'istri.nik.digits' => 'NIK istri harus tepat 16 digit angka.',
+                'suami.bin.regex' => 'Nama ayah (bin) hanya boleh mengandung huruf, spasi, dan titik.',
+                'pernikahan.tanggal.after_or_equal' => 'Tanggal pernikahan harus hari ini atau setelahnya.',
             ]);
         }
 
         if ($request->jenis_layanan == 'Izin Keramaian' && !$is_draft) {
             $request->validate([
-                'pemohon.nama' => 'required|string',
-                'pemohon.nik' => 'required|numeric',
-                'keramaian.tanggal' => 'required|string',
+                'pemohon.nama' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+                'pemohon.nik' => 'required|digits:16',
+                'keramaian.tanggal' => 'required|string|max:100',
                 'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ], [
+                'pemohon.nama.regex' => 'Nama pemohon hanya boleh mengandung huruf, spasi, dan titik.',
+                'pemohon.nik.digits' => 'NIK pemohon harus tepat 16 digit angka.',
             ]);
         }
 
         if ($request->jenis_layanan == 'Rekomendasi Bantuan' && !$is_draft) {
             $request->validate([
-                'rekomendasi.jenis_kelompok' => 'required|string',
-                'rekomendasi.nama_kelompok' => 'required|string',
-                'rekomendasi.alamat' => 'required|string',
-                'rekomendasi.perihal' => 'required|string',
-                'rekomendasi.nama_desa' => 'required|string',
+                'rekomendasi.jenis_kelompok' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z\s\/\-]+$/'],
+                'rekomendasi.nama_kelompok' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z0-9\s\.\-]+$/'],
+                'rekomendasi.alamat' => 'required|string|max:500',
+                'rekomendasi.perihal' => 'required|string|max:500',
+                'rekomendasi.nama_desa' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s]+$/'],
                 'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ], [
+                'rekomendasi.jenis_kelompok.regex' => 'Jenis kelompok hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
+                'rekomendasi.nama_kelompok.regex' => 'Nama kelompok hanya boleh mengandung huruf, angka, spasi, titik, dan strip.',
+                'rekomendasi.nama_desa.regex' => 'Nama desa hanya boleh mengandung huruf dan spasi.',
             ]);
         }
 

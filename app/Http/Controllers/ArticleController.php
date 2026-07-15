@@ -68,10 +68,14 @@ class ArticleController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
-            'category' => 'nullable|string',
+            'title' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\,\!\?\-\:\(\)]+$/'],
+            'content' => 'required|string|max:50000',
+            'category' => ['nullable', 'string', 'max:100', 'regex:/^[a-zA-Z\s\-]+$/'],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'title.regex' => 'Judul hanya boleh mengandung huruf, angka, spasi, dan tanda baca umum.',
+            'content.max' => 'Konten artikel maksimal 50.000 karakter.',
+            'category.regex' => 'Kategori hanya boleh mengandung huruf, spasi, dan strip.',
         ]);
 
         $imagePath = null;
@@ -110,10 +114,14 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required',
-            'category' => 'nullable|string',
+            'title' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s\.\,\!\?\-\:\(\)]+$/'],
+            'content' => 'required|string|max:50000',
+            'category' => ['nullable', 'string', 'max:100', 'regex:/^[a-zA-Z\s\-]+$/'],
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ], [
+            'title.regex' => 'Judul hanya boleh mengandung huruf, angka, spasi, dan tanda baca umum.',
+            'content.max' => 'Konten artikel maksimal 50.000 karakter.',
+            'category.regex' => 'Kategori hanya boleh mengandung huruf, spasi, dan strip.',
         ]);
 
         $data = [

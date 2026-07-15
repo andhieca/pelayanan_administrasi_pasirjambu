@@ -16,9 +16,9 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'nip' => ['nullable', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
+            'nip' => ['nullable', 'string', 'max:18', 'regex:/^[0-9]+$/'],
+            'phone' => ['nullable', 'string', 'max:15', 'regex:/^(08|628)[0-9]{8,13}$/'],
             'email' => [
                 'required',
                 'string',
@@ -27,6 +27,18 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, dan titik.',
+            'name.max' => 'Nama maksimal 100 karakter.',
+            'nip.regex' => 'NIP hanya boleh mengandung angka.',
+            'nip.max' => 'NIP maksimal 18 karakter.',
+            'phone.regex' => 'Nomor telepon tidak valid (contoh: 08xxxxxxxxxx).',
+            'phone.max' => 'Nomor telepon maksimal 15 karakter.',
         ];
     }
 }

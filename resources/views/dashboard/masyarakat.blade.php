@@ -61,6 +61,54 @@
         rekomendasi: { jenis_kelompok: '', nama_kelompok: '', alamat: '', perihal: '', nama_desa: '' },
         alasan: '',
         whatsapp: '',
+        validationErrors: {},
+
+        // Input sanitization helpers
+        sanitizeNama(value) {
+            return value.replace(/[^a-zA-Z\s\.\',]/g, '');
+        },
+        sanitizeNik(value) {
+            return value.replace(/[^0-9]/g, '').substring(0, 16);
+        },
+        sanitizePhone(value) {
+            return value.replace(/[^0-9]/g, '').substring(0, 15);
+        },
+        sanitizePekerjaan(value) {
+            return value.replace(/[^a-zA-Z\s\/\-]/g, '');
+        },
+        sanitizeTtl(value) {
+            return value.replace(/[^a-zA-Z\s,0-9]/g, '');
+        },
+        sanitizeNamaKelompok(value) {
+            return value.replace(/[^a-zA-Z0-9\s\.\-]/g, '');
+        },
+        sanitizeJenisKelompok(value) {
+            return value.replace(/[^a-zA-Z\s\/\-]/g, '');
+        },
+        sanitizeNamaDesa(value) {
+            return value.replace(/[^a-zA-Z\s]/g, '');
+        },
+        sanitizeAcara(value) {
+            return value.replace(/[^a-zA-Z\s\/\-]/g, '');
+        },
+
+        // Validation checker
+        validateField(field, value) {
+            let error = '';
+            switch(field) {
+                case 'nik':
+                    if (value && value.length !== 16) error = 'NIK harus tepat 16 digit';
+                    break;
+                case 'whatsapp':
+                    if (value && !/^(08|628)[0-9]{8,13}$/.test(value)) error = 'Format: 08xxxxxxxxxx';
+                    break;
+                case 'nama':
+                    if (value && !/^[a-zA-Z\s\.\',]+$/.test(value)) error = 'Hanya huruf, spasi, titik';
+                    break;
+            }
+            this.validationErrors[field] = error;
+            return error;
+        },
 
         handleFileUpload(event, key) {
             const file = event.target.files[0];
@@ -293,19 +341,21 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
-                                                    <input type="text" name="suami[nama]" x-model="suami.nama" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
+                                                    <input type="text" name="suami[nama]" x-model="suami.nama" @input="suami.nama = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
+                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf, spasi, titik, dan apostrof</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="number" name="suami[nik]" x-model="suami.nik" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <input type="text" name="suami[nik]" x-model="suami.nik" @input="suami.nik = sanitizeNik($event.target.value); validateField('suami_nik', suami.nik)" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <p x-show="suami.nik && suami.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="suami.nik.length"></span>/16)</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Bin</label>
-                                                    <input type="text" name="suami[bin]" x-model="suami.bin" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Ayah">
+                                                    <input type="text" name="suami[bin]" x-model="suami.bin" @input="suami.bin = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Ayah">
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
-                                                    <input type="text" name="suami[ttl]" x-model="suami.ttl" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1995">
+                                                    <input type="text" name="suami[ttl]" x-model="suami.ttl" @input="suami.ttl = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1995">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Agama</label>
@@ -321,7 +371,7 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Pekerjaan</label>
-                                                    <input type="text" name="suami[pekerjaan]" x-model="suami.pekerjaan" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
+                                                    <input type="text" name="suami[pekerjaan]" x-model="suami.pekerjaan" @input="suami.pekerjaan = sanitizePekerjaan($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Status</label>
@@ -334,7 +384,8 @@
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat</label>
-                                                    <textarea name="suami[alamat]" x-model="suami.alamat" rows="2" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
+                                                    <textarea name="suami[alamat]" x-model="suami.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
+                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="suami.alamat.length"></span>/500 karakter</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -348,19 +399,21 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
-                                                    <input type="text" name="istri[nama]" x-model="istri.nama" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
+                                                    <input type="text" name="istri[nama]" x-model="istri.nama" @input="istri.nama = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
+                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf, spasi, titik, dan apostrof</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="number" name="istri[nik]" x-model="istri.nik" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <input type="text" name="istri[nik]" x-model="istri.nik" @input="istri.nik = sanitizeNik($event.target.value)" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <p x-show="istri.nik && istri.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="istri.nik.length"></span>/16)</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Binti</label>
-                                                    <input type="text" name="istri[binti]" x-model="istri.binti" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Ayah">
+                                                    <input type="text" name="istri[binti]" x-model="istri.binti" @input="istri.binti = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Ayah">
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
-                                                    <input type="text" name="istri[ttl]" x-model="istri.ttl" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1995">
+                                                    <input type="text" name="istri[ttl]" x-model="istri.ttl" @input="istri.ttl = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1995">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Agama</label>
@@ -376,7 +429,7 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Pekerjaan</label>
-                                                    <input type="text" name="istri[pekerjaan]" x-model="istri.pekerjaan" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
+                                                    <input type="text" name="istri[pekerjaan]" x-model="istri.pekerjaan" @input="istri.pekerjaan = sanitizePekerjaan($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Status</label>
@@ -389,7 +442,8 @@
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat</label>
-                                                    <textarea name="istri[alamat]" x-model="istri.alamat" rows="2" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
+                                                    <textarea name="istri[alamat]" x-model="istri.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
+                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="istri.alamat.length"></span>/500 karakter</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -416,7 +470,7 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tanggal</label>
-                                                    <input type="date" name="pernikahan[tanggal]" x-model="pernikahan.tanggal" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
+                                                    <input type="date" name="pernikahan[tanggal]" x-model="pernikahan.tanggal" min="{{ date('Y-m-d') }}" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Waktu</label>
@@ -424,7 +478,7 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat Akad</label>
-                                                    <input type="text" name="pernikahan[tempat]" x-model="pernikahan.tempat" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Masjid / Alamat">
+                                                    <input type="text" name="pernikahan[tempat]" x-model="pernikahan.tempat" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Masjid / Alamat">
                                                 </div>
                                             </div>
                                         </div>
@@ -438,11 +492,13 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alasan Mengajukan Dispen Nikah</label>
-                                                    <textarea name="alasan" x-model="alasan" rows="3" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Jelaskan alasan pengajuan..."></textarea>
+                                                    <textarea name="alasan" x-model="alasan" rows="3" maxlength="1000" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Jelaskan alasan pengajuan..."></textarea>
+                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="alasan.length"></span>/1000 karakter</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nomor WhatsApp</label>
-                                                    <input type="number" name="whatsapp" x-model="whatsapp" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="08xxxxxxxxxx">
+                                                    <input type="text" name="whatsapp" x-model="whatsapp" @input="whatsapp = sanitizePhone($event.target.value)" maxlength="15" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="08xxxxxxxxxx">
+                                                    <p x-show="whatsapp && !/^(08|628)[0-9]{8,13}$/.test(whatsapp)" class="text-xs text-red-500 mt-1">Format: 08xxxxxxxxxx atau 628xxxxxxxxxx</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -499,15 +555,17 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
-                                                    <input type="text" name="pemohon[nama]" x-model="pemohon.nama" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
+                                                    <input type="text" name="pemohon[nama]" x-model="pemohon.nama" @input="pemohon.nama = sanitizeNama($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Sesuai KTP">
+                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf, spasi, titik, dan apostrof</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">NIK</label>
-                                                    <input type="number" name="pemohon[nik]" x-model="pemohon.nik" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <input type="text" name="pemohon[nik]" x-model="pemohon.nik" @input="pemohon.nik = sanitizeNik($event.target.value)" maxlength="16" minlength="16" inputmode="numeric" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="16 Digit">
+                                                    <p x-show="pemohon.nik && pemohon.nik.length !== 16" class="text-xs text-red-500 mt-1">NIK harus tepat 16 digit (<span x-text="pemohon.nik.length"></span>/16)</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Tempat, Tanggal Lahir</label>
-                                                    <input type="text" name="pemohon[ttl]" x-model="pemohon.ttl" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1990">
+                                                    <input type="text" name="pemohon[ttl]" x-model="pemohon.ttl" @input="pemohon.ttl = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Bandung, 12 Januari 1990">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Jenis Kelamin</label>
@@ -519,11 +577,12 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Pekerjaan</label>
-                                                    <input type="text" name="pemohon[pekerjaan]" x-model="pemohon.pekerjaan" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
+                                                    <input type="text" name="pemohon[pekerjaan]" x-model="pemohon.pekerjaan" @input="pemohon.pekerjaan = sanitizePekerjaan($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Pekerjaan saat ini">
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat</label>
-                                                    <textarea name="pemohon[alamat]" x-model="pemohon.alamat" rows="2" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
+                                                    <textarea name="pemohon[alamat]" x-model="pemohon.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Lengkap"></textarea>
+                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="pemohon.alamat.length"></span>/500 karakter</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -537,19 +596,19 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hari / Tanggal</label>
-                                                    <input type="text" name="keramaian[tanggal]" x-model="keramaian.tanggal" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Sabtu, 1 Februari 2026">
+                                                    <input type="text" name="keramaian[tanggal]" x-model="keramaian.tanggal" @input="keramaian.tanggal = sanitizeTtl($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Sabtu, 1 Februari 2026">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Acara</label>
-                                                    <input type="text" name="keramaian[acara]" x-model="keramaian.acara" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Pernikahan / Khitanan">
+                                                    <input type="text" name="keramaian[acara]" x-model="keramaian.acara" @input="keramaian.acara = sanitizeAcara($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Pernikahan / Khitanan">
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Lokasi</label>
-                                                    <input type="text" name="keramaian[lokasi]" x-model="keramaian.lokasi" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Lokasi Lengkap Acara">
+                                                    <input type="text" name="keramaian[lokasi]" x-model="keramaian.lokasi" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Lokasi Lengkap Acara">
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Hiburan</label>
-                                                    <input type="text" name="keramaian[hiburan]" x-model="keramaian.hiburan" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Orgen Tunggal / Wayang Golek">
+                                                    <input type="text" name="keramaian[hiburan]" x-model="keramaian.hiburan" @input="keramaian.hiburan = sanitizeAcara($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Orgen Tunggal / Wayang Golek">
                                                 </div>
                                             </div>
                                         </div>
@@ -596,23 +655,25 @@
                                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Jenis Kelompok</label>
-                                                    <input type="text" name="rekomendasi[jenis_kelompok]" x-model="rekomendasi.jenis_kelompok" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Kelompok Tani">
+                                                    <input type="text" name="rekomendasi[jenis_kelompok]" x-model="rekomendasi.jenis_kelompok" @input="rekomendasi.jenis_kelompok = sanitizeJenisKelompok($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Contoh: Kelompok Tani">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Kelompok</label>
-                                                    <input type="text" name="rekomendasi[nama_kelompok]" x-model="rekomendasi.nama_kelompok" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Kelompok">
+                                                    <input type="text" name="rekomendasi[nama_kelompok]" x-model="rekomendasi.nama_kelompok" @input="rekomendasi.nama_kelompok = sanitizeNamaKelompok($event.target.value)" maxlength="200" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Kelompok">
                                                 </div>
                                                 <div class="md:col-span-2">
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Alamat Lengkap</label>
-                                                    <textarea name="rekomendasi[alamat]" x-model="rekomendasi.alamat" rows="2" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Kelompok"></textarea>
+                                                    <textarea name="rekomendasi[alamat]" x-model="rekomendasi.alamat" rows="2" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Alamat Kelompok"></textarea>
+                                                    <p class="text-xs text-slate-400 mt-1"><span x-text="rekomendasi.alamat.length"></span>/500 karakter</p>
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Perihal</label>
-                                                    <input type="text" name="rekomendasi[perihal]" x-model="rekomendasi.perihal" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Perihal Bantuan">
+                                                    <input type="text" name="rekomendasi[perihal]" x-model="rekomendasi.perihal" maxlength="500" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Perihal Bantuan">
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Desa</label>
-                                                    <input type="text" name="rekomendasi[nama_desa]" x-model="rekomendasi.nama_desa" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Desa">
+                                                    <input type="text" name="rekomendasi[nama_desa]" x-model="rekomendasi.nama_desa" @input="rekomendasi.nama_desa = sanitizeNamaDesa($event.target.value)" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" placeholder="Nama Desa">
+                                                    <p class="text-xs text-slate-400 mt-1">Hanya huruf dan spasi</p>
                                                 </div>
                                             </div>
                                         </div>
