@@ -60,7 +60,12 @@
         isRejected(label) {
             if (!this.rejectedItems || !Array.isArray(this.rejectedItems)) return false;
             const target = String(label).trim().toLowerCase();
-            return this.rejectedItems.some(item => String(item).trim().toLowerCase() === target);
+            const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
+            return this.rejectedItems.some(item => {
+                const cleanItem = String(item).trim().toLowerCase();
+                const cleanWithoutPrefix = cleanItem.replace(/^berkas\s+/, '');
+                return cleanItem === target || cleanWithoutPrefix === targetWithoutPrefix;
+            });
         },
 
         isDetailRejected(label) {
@@ -69,7 +74,12 @@
             if (!items || items.length === 0) return false;
             
             const target = String(label).trim().toLowerCase();
-            return items.some(item => String(item).trim().toLowerCase() === target);
+            const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
+            return items.some(item => {
+                const cleanItem = String(item).trim().toLowerCase();
+                const cleanWithoutPrefix = cleanItem.replace(/^berkas\s+/, '');
+                return cleanItem === target || cleanWithoutPrefix === targetWithoutPrefix;
+            });
         },
 
         viewFile(path) {
