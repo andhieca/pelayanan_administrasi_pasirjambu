@@ -28,6 +28,8 @@ class PetugasController extends Controller
 
     public function validateBerkas(Request $request, $id)
     {
+        \Illuminate\Support\Facades\Log::info('Petugas validation request: ', $request->all());
+
         $request->validate([
             'action' => 'required|in:approve,reject',
             'keterangan' => 'nullable|string|max:500',

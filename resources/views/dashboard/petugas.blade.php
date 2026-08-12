@@ -47,6 +47,15 @@
         invalidItems: [], // Array of string descriptions for invalid items
         showKeteranganInput: false,
 
+        init() {
+            this.$watch('invalidItems', value => {
+                const detailInput = document.getElementById('detail_invalid_items_json');
+                if (detailInput) detailInput.value = JSON.stringify(value);
+                const simpleInput = document.getElementById('simple_invalid_items_json');
+                if (simpleInput) simpleInput.value = JSON.stringify(value);
+            });
+        },
+
         openDetail(p) {
             this.selectedPermohonan = p;
             this.invalidItems = []; // reset
@@ -255,7 +264,7 @@
                     <form x-bind:action="'/petugas/validate/' + selectedId" method="POST">
                         @csrf
                         <input type="hidden" name="action" x-model="actionType">
-                        <input type="hidden" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
+                        <input type="hidden" id="simple_invalid_items_json" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
                         
                         <div class="bg-white px-6 pt-6 pb-4">
                             <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full" 
@@ -591,15 +600,11 @@
                         </template>
                     </div>
                     <div class="bg-slate-50 px-6 py-4 flex flex-col items-end border-t border-slate-200">
-                         <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full" @submit="$el.querySelector('[name=invalid_items_json]').value = JSON.stringify(invalidItems)">
+                         <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full">
                             @csrf
                             <input type="hidden" name="action" :value="invalidItems.length > 0 ? 'reject' : 'approve'">
+                            <input type="hidden" id="detail_invalid_items_json" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
                             
-                            <input type="hidden" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
-                            <template x-for="(item, index) in invalidItems" :key="index">
-                                <input type="hidden" name="invalid_items[]" :value="item">
-                            </template>
-
                             <div x-show="invalidItems.length > 0" x-collapse class="w-full mb-4">
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Penolakan Tambahan (Opsional)</label>
                                 <textarea name="keterangan" rows="2" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 text-sm" placeholder="Tambahkan pesan khusus jika diperlukan..."></textarea>
