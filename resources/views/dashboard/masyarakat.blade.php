@@ -47,14 +47,16 @@
 
         isDetailRejected(label) {
             if (!this.selectedPermohonan) return false;
-            // If status is 'ditolak' but no specific invalid_items, highlight ALL sections
             if (this.selectedPermohonan.status === 'ditolak') {
-                const items = this.selectedPermohonan.invalid_items;
-                if (!items || (Array.isArray(items) && items.length === 0) || (typeof items === 'object' && Object.keys(items).length === 0)) {
+                let items = this.selectedPermohonan.invalid_items;
+                // Normalize: convert object to array if needed
+                if (items && !Array.isArray(items) && typeof items === 'object') {
+                    items = Object.values(items);
+                }
+                if (!items || (Array.isArray(items) && items.length === 0)) {
                     return true; // Highlight everything when no specific items listed
                 }
                 if (Array.isArray(items)) return items.includes(label);
-                return Object.values(items).includes(label);
             }
             return false;
         },
@@ -366,9 +368,18 @@
                 this.whatsapp = item.metadata.whatsapp || '';
                 this.existingFiles = item.metadata.files || {};
             }
-            this.rejectedItems = item.invalid_items || [];
+            // Normalize invalid_items: could be array, object, or null
+            let rawItems = item.invalid_items;
+            if (Array.isArray(rawItems)) {
+                this.rejectedItems = rawItems;
+            } else if (rawItems && typeof rawItems === 'object') {
+                this.rejectedItems = Object.values(rawItems);
+            } else {
+                this.rejectedItems = [];
+            }
+
             // If ditolak but no specific invalid_items, highlight all sections for this service
-            if (item.status === 'ditolak' && (!item.invalid_items || (Array.isArray(item.invalid_items) && item.invalid_items.length === 0) || (typeof item.invalid_items === 'object' && Object.keys(item.invalid_items).length === 0))) {
+            if (item.status === 'ditolak' && this.rejectedItems.length === 0) {
                 const allItems = [];
                 if (item.jenis_layanan === 'Dispen Nikah') {
                     allItems.push('Data Calon Suami', 'Data Calon Istri', 'Rencana Pernikahan');
