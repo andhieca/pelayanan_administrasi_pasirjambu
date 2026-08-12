@@ -58,7 +58,7 @@
         },
 
         isRejected(label) {
-            if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
+            if (this.selectedPermohonan && this.selectedPermohonan.status !== 'ditolak') return false;
             if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) return false;
             
             const target = String(label).trim().toLowerCase();
@@ -353,6 +353,7 @@
             }
         },
         resetForm() {
+            this.selectedPermohonan = null;
             this.showForm = false;
             this.isEdit = false;
             this.editId = null;
@@ -373,6 +374,7 @@
             this.rejectedItems = [];
         },
         editPermohonan(item) {
+            this.selectedPermohonan = item;
             this.activeTab = 'create';
             this.showForm = true;
             this.isEdit = true;
@@ -392,6 +394,30 @@
                 this.existingFiles = item.metadata.files || {};
             }
             this.rejectedItems = this.parseItems(item.invalid_items);
+
+            // If ditolak but no specific invalid_items, fallback to highlight all sections for this service
+            if (item.status === 'ditolak' && this.rejectedItems.length === 0) {
+                const allItems = [];
+                if (item.jenis_layanan === 'Dispen Nikah') {
+                    allItems.push('Data Calon Suami', 'Data Calon Istri', 'Rencana Pernikahan');
+                    if (item.metadata && item.metadata.files) {
+                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
+                    }
+                } else if (item.jenis_layanan === 'Izin Keramaian') {
+                    allItems.push('Data Pemohon', 'Maksud Keramaian');
+                    if (item.metadata && item.metadata.files) {
+                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
+                    }
+                } else if (item.jenis_layanan === 'Rekomendasi Bantuan') {
+                    allItems.push('Data Rekomendasi Bantuan');
+                    if (item.metadata && item.metadata.files) {
+                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
+                    }
+                } else {
+                    allItems.push('Berkas MAIN FILE');
+                }
+                this.rejectedItems = allItems;
+            }
         }
     }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
