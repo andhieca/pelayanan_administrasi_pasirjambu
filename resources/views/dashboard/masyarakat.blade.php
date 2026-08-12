@@ -58,7 +58,10 @@
         },
 
         isRejected(label) {
-            if (!this.rejectedItems || !Array.isArray(this.rejectedItems)) return false;
+            if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
+            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) {
+                return true; // General rejection fallback: highlight all sections
+            }
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
             return this.rejectedItems.some(item => {
@@ -71,7 +74,9 @@
         isDetailRejected(label) {
             if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
             const items = this.parseItems(this.selectedPermohonan.invalid_items);
-            if (!items || items.length === 0) return false;
+            if (!items || items.length === 0) {
+                return true; // General rejection fallback: highlight all sections
+            }
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
@@ -1293,7 +1298,8 @@
 
                                         <template x-if="parseItems(selectedPermohonan.invalid_items).length === 0">
                                             <div class="pl-11">
-                                                <p class="text-xs text-red-600">Mohon periksa permohonan Anda kembali sesuai catatan dari petugas di bawah.</p>
+                                                <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">⚠️ Periksa Semua Bagian</p>
+                                                <p class="text-xs text-red-600">Semua bagian yang ditandai merah di bawah perlu diperiksa dan diperbaiki sesuai Catatan Tambahan Petugas.</p>
                                             </div>
                                         </template>
 
