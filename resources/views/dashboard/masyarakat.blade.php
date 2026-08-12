@@ -60,7 +60,12 @@
         isRejected(label) {
             if (!this.isEdit) return false;
             if (this.selectedPermohonan && this.selectedPermohonan.status !== 'ditolak') return false;
-            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) return false;
+            
+            // Jika permohonan DITOLAK tapi invalid_items kosong (penolakan umum / permohonan lama),
+            // fallback ke true agar form edit tidak putih semua
+            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) {
+                return true;
+            }
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
@@ -74,7 +79,12 @@
         isDetailRejected(label) {
             if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
             const items = this.parseItems(this.selectedPermohonan.invalid_items);
-            if (!items || !Array.isArray(items) || items.length === 0) return false;
+            
+            // Jika permohonan DITOLAK tapi invalid_items kosong (penolakan umum / permohonan lama),
+            // fallback ke true agar detail permohonan tidak putih semua
+            if (!items || !Array.isArray(items) || items.length === 0) {
+                return true;
+            }
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
