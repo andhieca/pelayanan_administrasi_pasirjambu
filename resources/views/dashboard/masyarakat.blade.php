@@ -58,12 +58,9 @@
         },
 
         isRejected(label) {
+            if (!this.isEdit) return false;
             if (this.selectedPermohonan && this.selectedPermohonan.status !== 'ditolak') return false;
-            
-            // If ditolak but no specific invalid items array, highlight all sections as fallback so warning is never missing
-            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) {
-                return true;
-            }
+            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) return false;
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
@@ -77,11 +74,7 @@
         isDetailRejected(label) {
             if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
             const items = this.parseItems(this.selectedPermohonan.invalid_items);
-            
-            // If ditolak but no specific invalid items array, highlight all sections as fallback
-            if (!items || items.length === 0) {
-                return true;
-            }
+            if (!items || !Array.isArray(items) || items.length === 0) return false;
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
