@@ -375,6 +375,13 @@
             this.rejectedItems = [];
         },
         editPermohonan(item) {
+            console.log('=== DEBUG editPermohonan ===');
+            console.log('item.id:', item.id);
+            console.log('item.status:', item.status);
+            console.log('item.invalid_items (raw):', item.invalid_items);
+            console.log('item.invalid_items type:', typeof item.invalid_items);
+            console.log('item.invalid_items JSON:', JSON.stringify(item.invalid_items));
+            
             this.selectedPermohonan = item;
             this.activeTab = 'create';
             this.showForm = true;
@@ -395,6 +402,8 @@
                 this.existingFiles = item.metadata.files || {};
             }
             this.rejectedItems = this.parseItems(item.invalid_items);
+            console.log('rejectedItems (parsed):', JSON.stringify(this.rejectedItems));
+            console.log('=== END DEBUG ===');
         }
     }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">

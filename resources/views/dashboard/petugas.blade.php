@@ -598,29 +598,35 @@
                                 </template>
                             </div>
                         </template>
-                    </div>
-                    <div class="bg-slate-50 px-6 py-4 flex flex-col items-end border-t border-slate-200">
-                         <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full">
-                            @csrf
-                            <input type="hidden" name="action" :value="invalidItems.length > 0 ? 'reject' : 'approve'">
-                            <input type="hidden" id="detail_invalid_items_json" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
-                            
-                            <div x-show="invalidItems.length > 0" x-collapse class="w-full mb-4">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Penolakan Tambahan (Opsional)</label>
-                                <textarea name="keterangan" rows="2" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 text-sm" placeholder="Tambahkan pesan khusus jika diperlukan..."></textarea>
-                            </div>
-                            
-                            <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 w-full">
-                                <button type="button" @click="showDetailModal = false" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-300 px-5 py-2 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
-                                    Tutup
-                                </button>
-                                <button type="submit" @click="const el = document.getElementById('detail_invalid_items_json'); if(el) el.value = JSON.stringify(invalidItems)"
-                                        class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all"
-                                        :class="invalidItems.length > 0 ? 'bg-red-600 hover:bg-red-700' : 'bg-bedas-600 hover:bg-bedas-700'"
-                                        x-text="invalidItems.length > 0 ? 'Tolak Permohonan (' + invalidItems.length + ' item)' : 'Setujui & Teruskan ke Camat'">
-                                </button>
-                            </div>
-                        </form>
+                        <div class="bg-slate-50 px-6 py-4 flex flex-col items-end border-t border-slate-200">
+                            <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full"
+                                  @submit.prevent="
+                                      const form = $el;
+                                      form.querySelector('#detail_action').value = invalidItems.length > 0 ? 'reject' : 'approve';
+                                      form.querySelector('#detail_invalid_items_json').value = JSON.stringify(invalidItems);
+                                      form.submit();
+                                  ">
+                                @csrf
+                                <input type="hidden" id="detail_action" name="action" value="">
+                                <input type="hidden" id="detail_invalid_items_json" name="invalid_items_json" value="[]">
+                                
+                                <div x-show="invalidItems.length > 0" x-collapse class="w-full mb-4">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Catatan Penolakan Tambahan (Opsional)</label>
+                                    <textarea name="keterangan" rows="2" class="w-full border-slate-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 text-sm" placeholder="Tambahkan pesan khusus jika diperlukan..."></textarea>
+                                </div>
+                                
+                                <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 w-full">
+                                    <button type="button" @click="showDetailModal = false" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-300 px-5 py-2 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                                        Tutup
+                                    </button>
+                                    <button type="submit"
+                                            class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all"
+                                            :class="invalidItems.length > 0 ? 'bg-red-600 hover:bg-red-700' : 'bg-bedas-600 hover:bg-bedas-700'"
+                                            x-text="invalidItems.length > 0 ? 'Tolak Permohonan (' + invalidItems.length + ' item)' : 'Setujui & Teruskan ke Camat'">
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
