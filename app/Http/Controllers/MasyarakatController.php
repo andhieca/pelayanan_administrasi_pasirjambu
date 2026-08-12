@@ -401,8 +401,9 @@ class MasyarakatController extends Controller
             $data['status'] = 'draft';
         } else {
             $data['status'] = 'pending';
-            // Generate no_antrean if it doesn't have one (if transitioning from draft)
-            if (!$permohonan->no_antrean) {
+            // FCFS: Generate new no_antrean if transitioning from draft (no queue number yet)
+            // OR if resubmitting after rejection (must go to back of queue)
+            if (!$permohonan->no_antrean || $permohonan->status === 'ditolak') {
                 $logic_number = Permohonan::whereDate('created_at', today())->whereNotNull('no_antrean')->count() + 1;
                 $data['no_antrean'] = date('Ymd') . str_pad($logic_number, 3, '0', STR_PAD_LEFT);
             }
@@ -413,8 +414,10 @@ class MasyarakatController extends Controller
 
         $permohonan->update($data);
 
+        // Determine log action: resubmitted (from ditolak), draft_updated, or updated
+        $logAction = $is_draft ? 'draft_updated' : ($permohonan->getOriginal('status') === 'ditolak' ? 'resubmitted' : 'updated');
         $permohonan->logs()->create([
-            'action' => $is_draft ? 'draft_updated' : 'updated',
+            'action' => $logAction,
             'actor_id' => Auth::id(),
         ]);
 
