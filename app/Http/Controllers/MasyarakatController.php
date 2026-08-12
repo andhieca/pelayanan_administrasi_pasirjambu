@@ -406,6 +406,8 @@ class MasyarakatController extends Controller
             if (!$permohonan->no_antrean || $permohonan->status === 'ditolak') {
                 $logic_number = Permohonan::whereDate('created_at', today())->whereNotNull('no_antrean')->count() + 1;
                 $data['no_antrean'] = date('Ymd') . str_pad($logic_number, 3, '0', STR_PAD_LEFT);
+                // Reset timestamp so the displayed time reflects resubmission, not original submission
+                $data['created_at'] = now();
             }
         }
 
