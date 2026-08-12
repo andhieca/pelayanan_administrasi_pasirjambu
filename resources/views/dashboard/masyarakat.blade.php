@@ -91,6 +91,11 @@
         sanitizeNik(value) {
             return value.replace(/[^0-9]/g, '').substring(0, 16);
         },
+        nikBirthDate(nik) {
+            let dd = parseInt(nik.substring(6, 8));
+            if (dd >= 41) dd -= 40; // Perempuan: tanggal lahir + 40
+            return String(dd).padStart(2, '0') + '-' + nik.substring(8, 10) + '-' + nik.substring(10, 12);
+        },
         nikErrors: {},
         validateNik(nik, fieldKey) {
             if (!nik || nik.length === 0) {
@@ -578,7 +583,7 @@
                                                     <!-- Format breakdown when 16 digits -->
                                                     <div x-show="suami.nik && suami.nik.length === 16 && !nikErrors['suami']" class="mt-1 flex items-center gap-1">
                                                         <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + suami.nik.substring(0,2) + '.' + suami.nik.substring(2,4) + '.' + suami.nik.substring(4,6) + ' | Lahir: ' + suami.nik.substring(6,8) + '-' + suami.nik.substring(8,10) + '-' + suami.nik.substring(10,12) + ' | Urut: ' + suami.nik.substring(12,16)"></span></p>
+                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + suami.nik.substring(0,2) + '.' + suami.nik.substring(2,4) + '.' + suami.nik.substring(4,6) + ' | Lahir: ' + nikBirthDate(suami.nik) + ' | Urut: ' + suami.nik.substring(12,16)"></span></p>
                                                     </div>
                                                     <!-- Error messages -->
                                                     <p x-show="nikErrors['suami']" class="text-xs text-red-500 mt-1 flex items-center gap-1"><svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span x-text="nikErrors['suami']"></span></p>
@@ -662,7 +667,7 @@
                                                     <!-- Format breakdown when 16 digits -->
                                                     <div x-show="istri.nik && istri.nik.length === 16 && !nikErrors['istri']" class="mt-1 flex items-center gap-1">
                                                         <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + istri.nik.substring(0,2) + '.' + istri.nik.substring(2,4) + '.' + istri.nik.substring(4,6) + ' | Lahir: ' + istri.nik.substring(6,8) + '-' + istri.nik.substring(8,10) + '-' + istri.nik.substring(10,12) + ' | Urut: ' + istri.nik.substring(12,16)"></span></p>
+                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + istri.nik.substring(0,2) + '.' + istri.nik.substring(2,4) + '.' + istri.nik.substring(4,6) + ' | Lahir: ' + nikBirthDate(istri.nik) + ' | Urut: ' + istri.nik.substring(12,16)"></span></p>
                                                     </div>
                                                     <!-- Error messages -->
                                                     <p x-show="nikErrors['istri']" class="text-xs text-red-500 mt-1 flex items-center gap-1"><svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span x-text="nikErrors['istri']"></span></p>
@@ -850,7 +855,7 @@
                                                     <!-- Format breakdown when 16 digits -->
                                                     <div x-show="pemohon.nik && pemohon.nik.length === 16 && !nikErrors['pemohon']" class="mt-1 flex items-center gap-1">
                                                         <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + pemohon.nik.substring(0,2) + '.' + pemohon.nik.substring(2,4) + '.' + pemohon.nik.substring(4,6) + ' | Lahir: ' + pemohon.nik.substring(6,8) + '-' + pemohon.nik.substring(8,10) + '-' + pemohon.nik.substring(10,12) + ' | Urut: ' + pemohon.nik.substring(12,16)"></span></p>
+                                                        <p class="text-[10px] text-emerald-600 font-medium">NIK Valid — <span class="text-slate-400" x-text="'Wilayah: ' + pemohon.nik.substring(0,2) + '.' + pemohon.nik.substring(2,4) + '.' + pemohon.nik.substring(4,6) + ' | Lahir: ' + nikBirthDate(pemohon.nik) + ' | Urut: ' + pemohon.nik.substring(12,16)"></span></p>
                                                     </div>
                                                     <!-- Error messages -->
                                                     <p x-show="nikErrors['pemohon']" class="text-xs text-red-500 mt-1 flex items-center gap-1"><svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> <span x-text="nikErrors['pemohon']"></span></p>
