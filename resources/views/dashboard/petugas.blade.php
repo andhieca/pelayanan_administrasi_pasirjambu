@@ -591,7 +591,7 @@
                         </template>
                     </div>
                     <div class="bg-slate-50 px-6 py-4 flex flex-col items-end border-t border-slate-200">
-                         <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full">
+                         <form method="POST" :action="'/petugas/validate/' + selectedPermohonan.id" class="w-full" @submit="$el.querySelector('[name=invalid_items_json]').value = JSON.stringify(invalidItems)">
                             @csrf
                             <input type="hidden" name="action" :value="invalidItems.length > 0 ? 'reject' : 'approve'">
                             

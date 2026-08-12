@@ -50,11 +50,14 @@ class PetugasController extends Controller
             if (empty($invalidItems) && $request->filled('invalid_items_json')) {
                 $invalidItems = json_decode($request->invalid_items_json, true);
             }
+            if (is_string($invalidItems)) {
+                $invalidItems = json_decode($invalidItems, true);
+            }
 
             $permohonan->update([
                 'status' => 'ditolak',
                 'keterangan' => $request->keterangan,
-                'invalid_items' => is_array($invalidItems) ? $invalidItems : [],
+                'invalid_items' => is_array($invalidItems) ? array_values(array_filter($invalidItems)) : [],
             ]);
             $permohonan->logs()->create([
                 'action' => 'rejected',

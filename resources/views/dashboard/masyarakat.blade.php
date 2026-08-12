@@ -53,9 +53,6 @@
                 if (items && !Array.isArray(items) && typeof items === 'object') {
                     items = Object.values(items);
                 }
-                if (!items || (Array.isArray(items) && items.length === 0)) {
-                    return true; // Highlight everything when no specific items listed (general rejection)
-                }
                 if (Array.isArray(items)) return items.includes(label);
             }
             return false;
@@ -376,30 +373,6 @@
                 this.rejectedItems = Object.values(rawItems);
             } else {
                 this.rejectedItems = [];
-            }
-
-            // If ditolak but no specific invalid_items, highlight all sections for this service
-            if (item.status === 'ditolak' && this.rejectedItems.length === 0) {
-                const allItems = [];
-                if (item.jenis_layanan === 'Dispen Nikah') {
-                    allItems.push('Data Calon Suami', 'Data Calon Istri', 'Rencana Pernikahan');
-                    if (item.metadata && item.metadata.files) {
-                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
-                    }
-                } else if (item.jenis_layanan === 'Izin Keramaian') {
-                    allItems.push('Data Pemohon', 'Maksud Keramaian');
-                    if (item.metadata && item.metadata.files) {
-                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
-                    }
-                } else if (item.jenis_layanan === 'Rekomendasi Bantuan') {
-                    allItems.push('Data Rekomendasi Bantuan');
-                    if (item.metadata && item.metadata.files) {
-                        Object.keys(item.metadata.files).forEach(k => allItems.push('Berkas ' + k.replace('_', ' ').toUpperCase()));
-                    }
-                } else {
-                    allItems.push('Berkas MAIN FILE');
-                }
-                this.rejectedItems = allItems;
             }
         }
     }">
@@ -1300,8 +1273,7 @@
 
                                         <template x-if="!selectedPermohonan.invalid_items || Object.values(selectedPermohonan.invalid_items || {}).length === 0">
                                             <div class="pl-11">
-                                                <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">⚠️ Periksa Semua Bagian</p>
-                                                <p class="text-xs text-red-600">Semua bagian yang ditandai merah di bawah perlu diperiksa dan diperbaiki.</p>
+                                                <p class="text-xs text-red-600">Mohon periksa permohonan Anda kembali sesuai catatan dari petugas di bawah.</p>
                                             </div>
                                         </template>
 
