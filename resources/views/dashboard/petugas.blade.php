@@ -285,7 +285,7 @@
                         </div>
                         
                         <div class="bg-slate-50 px-6 py-4 flex flex-row-reverse gap-3">
-                            <button type="submit" 
+                            <button type="submit" @click="const el = document.getElementById('simple_invalid_items_json'); if(el) el.value = JSON.stringify(invalidItems)"
                                 class="w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto transition-colors"
                                 :class="actionType === 'reject' ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'">
                                 <span x-text="actionType === 'reject' ? 'Tolak Permohonan' : 'Validasi & Ajukan ke Camat'"></span>
@@ -614,7 +614,8 @@
                                 <button type="button" @click="showDetailModal = false" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-slate-300 px-5 py-2 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
                                     Tutup
                                 </button>
-                                <button type="submit" class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all"
+                                <button type="submit" @click="const el = document.getElementById('detail_invalid_items_json'); if(el) el.value = JSON.stringify(invalidItems)"
+                                        class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all"
                                         :class="invalidItems.length > 0 ? 'bg-red-600 hover:bg-red-700' : 'bg-bedas-600 hover:bg-bedas-700'"
                                         x-text="invalidItems.length > 0 ? 'Tolak Permohonan (' + invalidItems.length + ' item)' : 'Setujui & Teruskan ke Camat'">
                                 </button>
