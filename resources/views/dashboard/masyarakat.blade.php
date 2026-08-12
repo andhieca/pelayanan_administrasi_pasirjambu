@@ -58,15 +58,9 @@
         },
 
         isRejected(label) {
-            // Jika tidak sedang meng-edit permohonan yang ditolak, pasti false (Form Buat Permohonan Baru 100% bersih)
             if (!this.isEdit) return false;
             if (this.selectedPermohonan && this.selectedPermohonan.status !== 'ditolak') return false;
-            
-            // Jika permohonan DITOLAK tetapi invalid_items kosong (penolakan umum),
-            // fallback ke true agar SEMUA bagian ditandai merah di form Ubah Permohonan
-            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) {
-                return true;
-            }
+            if (!this.rejectedItems || !Array.isArray(this.rejectedItems) || this.rejectedItems.length === 0) return false;
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
@@ -80,12 +74,7 @@
         isDetailRejected(label) {
             if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
             const items = this.parseItems(this.selectedPermohonan.invalid_items);
-            
-            // Jika permohonan DITOLAK tetapi invalid_items kosong (penolakan umum),
-            // fallback ke true agar SEMUA bagian ditandai merah di Modal Detail
-            if (!items || !Array.isArray(items) || items.length === 0) {
-                return true;
-            }
+            if (!items || !Array.isArray(items) || items.length === 0) return false;
             
             const target = String(label).trim().toLowerCase();
             const targetWithoutPrefix = target.replace(/^berkas\s+/, '');
