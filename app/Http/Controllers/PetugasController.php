@@ -47,8 +47,11 @@ class PetugasController extends Controller
 
         if ($request->action === 'reject') {
             $invalidItems = $request->invalid_items;
-            if (empty($invalidItems) && $request->filled('invalid_items_json')) {
-                $invalidItems = json_decode($request->invalid_items_json, true);
+            if ($request->filled('invalid_items_json')) {
+                $decoded = json_decode($request->invalid_items_json, true);
+                if (is_array($decoded) && count($decoded) > 0) {
+                    $invalidItems = $decoded;
+                }
             }
             if (is_string($invalidItems)) {
                 $invalidItems = json_decode($invalidItems, true);
