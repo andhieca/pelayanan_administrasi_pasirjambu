@@ -154,8 +154,7 @@ class MasyarakatController extends Controller
         $no_antrean = null;
 
         if (!$is_draft) {
-            $logic_number = Permohonan::whereDate('created_at', today())->whereNotNull('no_antrean')->count() + 1;
-            $no_antrean = date('Ymd') . str_pad($logic_number, 3, '0', STR_PAD_LEFT);
+            $no_antrean = Permohonan::generateNoAntrean();
         }
 
         $path = null;
@@ -404,8 +403,7 @@ class MasyarakatController extends Controller
             // FCFS: Generate new no_antrean if transitioning from draft (no queue number yet)
             // OR if resubmitting after rejection (must go to back of queue)
             if (!$permohonan->no_antrean || $permohonan->status === 'ditolak') {
-                $logic_number = Permohonan::whereDate('created_at', today())->whereNotNull('no_antrean')->count() + 1;
-                $data['no_antrean'] = date('Ymd') . str_pad($logic_number, 3, '0', STR_PAD_LEFT);
+                $data['no_antrean'] = Permohonan::generateNoAntrean();
                 // Reset timestamp so the displayed time reflects resubmission, not original submission
                 $data['created_at'] = now();
             }
