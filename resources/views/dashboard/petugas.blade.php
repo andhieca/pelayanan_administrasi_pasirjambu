@@ -255,6 +255,7 @@
                     <form x-bind:action="'/petugas/validate/' + selectedId" method="POST">
                         @csrf
                         <input type="hidden" name="action" x-model="actionType">
+                        <input type="hidden" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
                         
                         <div class="bg-white px-6 pt-6 pb-4">
                             <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full" 
@@ -594,7 +595,8 @@
                             @csrf
                             <input type="hidden" name="action" :value="invalidItems.length > 0 ? 'reject' : 'approve'">
                             
-                            <template x-for="item in invalidItems">
+                            <input type="hidden" name="invalid_items_json" :value="JSON.stringify(invalidItems)">
+                            <template x-for="(item, index) in invalidItems" :key="index">
                                 <input type="hidden" name="invalid_items[]" :value="item">
                             </template>
 
