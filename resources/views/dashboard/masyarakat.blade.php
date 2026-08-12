@@ -41,21 +41,35 @@
         isDraftValue: 0,
         rejectedItems: [],
 
+        parseItems(raw) {
+            if (!raw) return [];
+            if (Array.isArray(raw)) return raw;
+            if (typeof raw === 'string') {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                    if (parsed && typeof parsed === 'object') return Object.values(parsed);
+                } catch(e) {
+                    return [raw];
+                }
+            }
+            if (typeof raw === 'object') return Object.values(raw);
+            return [];
+        },
+
         isRejected(label) {
-            return this.rejectedItems.includes(label);
+            if (!this.rejectedItems || !Array.isArray(this.rejectedItems)) return false;
+            const target = String(label).trim().toLowerCase();
+            return this.rejectedItems.some(item => String(item).trim().toLowerCase() === target);
         },
 
         isDetailRejected(label) {
-            if (!this.selectedPermohonan) return false;
-            if (this.selectedPermohonan.status === 'ditolak') {
-                let items = this.selectedPermohonan.invalid_items;
-                // Normalize: convert object to array if needed
-                if (items && !Array.isArray(items) && typeof items === 'object') {
-                    items = Object.values(items);
-                }
-                if (Array.isArray(items)) return items.includes(label);
-            }
-            return false;
+            if (!this.selectedPermohonan || this.selectedPermohonan.status !== 'ditolak') return false;
+            const items = this.parseItems(this.selectedPermohonan.invalid_items);
+            if (!items || items.length === 0) return false;
+            
+            const target = String(label).trim().toLowerCase();
+            return items.some(item => String(item).trim().toLowerCase() === target);
         },
 
         viewFile(path) {
@@ -365,15 +379,7 @@
                 this.whatsapp = item.metadata.whatsapp || '';
                 this.existingFiles = item.metadata.files || {};
             }
-            // Normalize invalid_items: could be array, object, or null
-            let rawItems = item.invalid_items;
-            if (Array.isArray(rawItems)) {
-                this.rejectedItems = rawItems;
-            } else if (rawItems && typeof rawItems === 'object') {
-                this.rejectedItems = Object.values(rawItems);
-            } else {
-                this.rejectedItems = [];
-            }
+            this.rejectedItems = this.parseItems(item.invalid_items);
         }
     }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -1264,18 +1270,18 @@
                                             </div>
                                         </div>
 
-                                        <template x-if="selectedPermohonan.invalid_items && Object.values(selectedPermohonan.invalid_items).length > 0">
+                                        <template x-if="parseItems(selectedPermohonan.invalid_items).length > 0">
                                             <div class="pl-11">
                                                 <p class="text-xs font-semibold text-red-800 mb-2 uppercase tracking-wide">Item yang tidak sesuai:</p>
                                                 <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                                                    <template x-for="item in Object.values(selectedPermohonan.invalid_items)">
+                                                    <template x-for="item in parseItems(selectedPermohonan.invalid_items)">
                                                         <li x-text="item"></li>
                                                     </template>
                                                 </ul>
                                             </div>
                                         </template>
 
-                                        <template x-if="!selectedPermohonan.invalid_items || Object.values(selectedPermohonan.invalid_items || {}).length === 0">
+                                        <template x-if="parseItems(selectedPermohonan.invalid_items).length === 0">
                                             <div class="pl-11">
                                                 <p class="text-xs text-red-600">Mohon periksa permohonan Anda kembali sesuai catatan dari petugas di bawah.</p>
                                             </div>
