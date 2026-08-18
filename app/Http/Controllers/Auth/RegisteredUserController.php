@@ -32,14 +32,22 @@ class RegisteredUserController extends Controller
     {
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email:rfc', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', 'max:15', 'regex:/^(08|628)[0-9]{8,13}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [
-            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, dan titik.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'name.regex' => 'Nama hanya boleh mengandung huruf, spasi, titik, dan koma (sesuai KTP).',
             'name.max' => 'Nama maksimal 100 karakter.',
-            'phone.regex' => 'Nomor telepon tidak valid (contoh: 08xxxxxxxxxx).',
-            'phone.max' => 'Nomor telepon maksimal 15 karakter.',
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format penulisan alamat email tidak valid (contoh: nama@domain.com).',
+            'email.unique' => 'Alamat email ini sudah terdaftar. Silakan gunakan email lain atau masuk.',
+            'phone.required' => 'Nomor WhatsApp wajib diisi.',
+            'phone.regex' => 'Nomor WhatsApp tidak valid (harus diawali 08 atau 628, minimal 10 digit).',
+            'phone.max' => 'Nomor WhatsApp maksimal 15 karakter.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok dengan kata sandi di atas.',
         ]);
 
         if ($validator->fails()) {

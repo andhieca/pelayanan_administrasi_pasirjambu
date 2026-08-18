@@ -1307,67 +1307,166 @@
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 class="inline-block px-8 py-10 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-3xl sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
 
-                <div class="text-center mb-8">
+                <div class="text-center mb-6">
                     <h2 class="text-2xl font-display font-bold text-slate-900">Daftar Akun Baru</h2>
-                    <p class="text-slate-500 mt-2 text-sm">Lengkapi data Anda untuk mulai menggunakan layanan</p>
+                    <p class="text-slate-500 mt-1 text-sm">Lengkapi data Anda untuk mulai menggunakan layanan</p>
                 </div>
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                <form method="POST" action="{{ route('register') }}" class="space-y-4" x-data="{
+                    regName: '{{ old('name') }}',
+                    regEmail: '{{ old('email') }}',
+                    regPhone: '{{ old('phone') }}',
+                    regPassword: '',
+                    regPasswordConfirm: '',
+                    
+                    isEmailValid(email) {
+                        if (!email) return null;
+                        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+                    },
+                    isPhoneValid(phone) {
+                        if (!phone) return null;
+                        return /^(08|628)[0-9]{8,13}$/.test(phone);
+                    },
+                    isNameValid(name) {
+                        if (!name) return null;
+                        return /^[a-zA-Z\s\.\',]+$/.test(name);
+                    }
+                }">
                     @csrf
+
+                    <!-- Nama Lengkap -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Lengkap</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
-                            placeholder="Nama Sesuai KTP">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <span class="text-[11px] text-slate-400">Sesuai KTP</span>
+                        </div>
+                        <input type="text" name="name" x-model="regName" required
+                            class="w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none"
+                            :class="regName.length > 0 ? (isNameValid(regName) ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-red-300 bg-red-50/30 focus:ring-4 focus:ring-red-100 focus:border-red-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
+                            placeholder="Contoh: Ahmad Hidayat">
+                        <template x-if="regName && !isNameValid(regName)">
+                            <p class="mt-1 text-[11px] text-red-500 flex items-center gap-1 font-medium">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                Nama hanya boleh huruf, spasi, titik, dan koma.
+                            </p>
+                        </template>
                         @if ($errors->has('name'))
-                            <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $errors->first('name') }}</p>
+                            <p class="mt-1 text-[11px] text-red-500 font-medium">{{ $errors->first('name') }}</p>
                         @endif
                     </div>
 
+                    <!-- Alamat Email -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Alamat Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Alamat Email <span class="text-red-500">*</span></label>
+                            <span class="text-[11px] text-slate-400">Format: nama@domain.com</span>
+                        </div>
+                        <input type="email" name="email" x-model="regEmail" required
+                            class="w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none"
+                            :class="regEmail.length > 0 ? (isEmailValid(regEmail) ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-amber-400 bg-amber-50/30 focus:ring-4 focus:ring-amber-100 focus:border-amber-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
                             placeholder="nama@email.com">
+                        
+                        <!-- Real-time Email Format Feedback -->
+                        <div class="mt-1">
+                            <template x-if="regEmail.length > 0 && isEmailValid(regEmail)">
+                                <p class="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
+                                    <svg class="w-3.5 h-3.5 flex-shrink-0 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                    Format email valid
+                                </p>
+                            </template>
+                            <template x-if="regEmail.length > 0 && !isEmailValid(regEmail)">
+                                <p class="text-[11px] text-amber-600 flex items-center gap-1 font-medium">
+                                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Format email harus lengkap dengan simbol @ dan domain (contoh: budi@gmail.com)
+                                </p>
+                            </template>
+                            <template x-if="!regEmail || regEmail.length === 0">
+                                <p class="text-[11px] text-slate-400">Gunakan email aktif (Gmail, Yahoo, Outlook, dll) untuk masuk ke akun</p>
+                            </template>
+                        </div>
                         @if ($errors->has('email') && !$errors->has('password'))
-                            <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $errors->first('email') }}</p>
+                            <p class="mt-1 text-[11px] text-red-500 font-medium">{{ $errors->first('email') }}</p>
                         @endif
                     </div>
 
+                    <!-- Nomor WhatsApp -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nomor WhatsApp</label>
-                        <input type="tel" name="phone" value="{{ old('phone') }}" required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Nomor WhatsApp <span class="text-red-500">*</span></label>
+                            <span class="text-[11px] text-slate-400">Awalan 08 / 628</span>
+                        </div>
+                        <input type="tel" name="phone" x-model="regPhone" required
+                            class="w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none"
+                            :class="regPhone.length > 0 ? (isPhoneValid(regPhone) ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-amber-400 bg-amber-50/30 focus:ring-4 focus:ring-amber-100 focus:border-amber-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
                             placeholder="Contoh: 081234567890">
+                        <div class="mt-1">
+                            <template x-if="regPhone.length > 0 && !isPhoneValid(regPhone)">
+                                <p class="text-[11px] text-amber-600 flex items-center gap-1 font-medium">
+                                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Nomor harus 10-15 digit dan diawali 08 atau 628
+                                </p>
+                            </template>
+                            <template x-if="!regPhone || regPhone.length === 0">
+                                <p class="text-[11px] text-slate-400">Untuk menerima notifikasi status permohonan surat</p>
+                            </template>
+                        </div>
                         @if ($errors->has('phone'))
-                            <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $errors->first('phone') }}</p>
+                            <p class="mt-1 text-[11px] text-red-500 font-medium">{{ $errors->first('phone') }}</p>
                         @endif
                     </div>
 
+                    <!-- Kata Sandi -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Kata Sandi</label>
-                        <input type="password" name="password" required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Kata Sandi <span class="text-red-500">*</span></label>
+                            <span class="text-[11px]" :class="regPassword.length >= 8 ? 'text-emerald-600 font-semibold' : 'text-slate-400'">Min. 8 karakter</span>
+                        </div>
+                        <input type="password" name="password" x-model="regPassword" required
+                            class="w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none"
+                            :class="regPassword.length > 0 ? (regPassword.length >= 8 ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-amber-400 bg-amber-50/30 focus:ring-4 focus:ring-amber-100 focus:border-amber-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
                             placeholder="Minimal 8 karakter">
+                        <template x-if="regPassword.length > 0 && regPassword.length < 8">
+                            <p class="mt-1 text-[11px] text-amber-600 font-medium flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                <span x-text="'Kurang ' + (8 - regPassword.length) + ' karakter lagi'"></span>
+                            </p>
+                        </template>
                         @if ($errors->has('password'))
-                            <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $errors->first('password') }}</p>
+                            <p class="mt-1 text-[11px] text-red-500 font-medium">{{ $errors->first('password') }}</p>
                         @endif
                     </div>
 
+                    <!-- Konfirmasi Sandi -->
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Konfirmasi Sandi</label>
-                        <input type="password" name="password_confirmation" required
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500 transition-all outline-none"
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Konfirmasi Sandi <span class="text-red-500">*</span></label>
+                            <span class="text-[11px] text-slate-400">Ketik ulang kata sandi</span>
+                        </div>
+                        <input type="password" name="password_confirmation" x-model="regPasswordConfirm" required
+                            class="w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none"
+                            :class="regPasswordConfirm.length > 0 ? (regPasswordConfirm === regPassword ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-red-300 bg-red-50/30 focus:ring-4 focus:ring-red-100 focus:border-red-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
                             placeholder="Ulangi kata sandi">
+                        <template x-if="regPasswordConfirm.length > 0 && regPasswordConfirm !== regPassword">
+                            <p class="mt-1 text-[11px] text-red-500 flex items-center gap-1 font-medium">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                Konfirmasi kata sandi tidak cocok
+                            </p>
+                        </template>
+                        <template x-if="regPasswordConfirm.length > 0 && regPasswordConfirm === regPassword">
+                            <p class="mt-1 text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                Kata sandi cocok
+                            </p>
+                        </template>
                     </div>
 
                     <button type="submit"
-                        class="w-full py-4 bg-bedas-600 text-white font-bold rounded-xl shadow-lg shadow-bedas-200 hover:bg-bedas-700 transition-all transform active:scale-[0.98] mt-2">
+                        class="w-full py-3.5 bg-bedas-600 text-white font-bold rounded-xl shadow-lg shadow-bedas-200 hover:bg-bedas-700 transition-all transform active:scale-[0.98] mt-2">
                         Daftar Sekarang
                     </button>
                 </form>
 
-                <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                <div class="mt-6 pt-5 border-t border-slate-100 text-center">
                     <p class="text-sm text-slate-500">
                         Sudah punya akun?
                         <button @click="toggleAuth()" class="font-bold text-bedas-600 hover:text-bedas-700">Masuk
