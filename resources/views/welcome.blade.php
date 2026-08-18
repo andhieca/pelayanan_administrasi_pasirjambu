@@ -231,12 +231,26 @@
                 </p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-10" x-data="{ shown: false }" x-intersect="shown = true">
+            <div class="grid md:grid-cols-3 gap-10" x-data="{ 
+                shown: false, 
+                showServiceDetail: false, 
+                activeService: null,
+                openService(service) {
+                    this.activeService = service;
+                    this.showServiceDetail = true;
+                    document.body.style.overflow = 'hidden';
+                },
+                closeService() {
+                    this.showServiceDetail = false;
+                    document.body.style.overflow = 'auto';
+                }
+            }" x-intersect="shown = true">
                 <!-- Card 1 -->
                 <div x-show="shown" x-transition:enter="transition ease-out duration-700 delay-[200ms]"
                     x-transition:enter-start="opacity-0 translate-y-10"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="group p-10 bg-slate-50 rounded-3xl border border-slate-100 hover:bg-white hover:border-bedas-200 hover:shadow-[0_20px_50px_rgba(0,159,77,0.1)] transition-all duration-500 relative overflow-hidden">
+                    @click="openService('dispen')"
+                    class="cursor-pointer group p-10 bg-slate-50 rounded-3xl border border-slate-100 hover:bg-white hover:border-bedas-200 hover:shadow-[0_20px_50px_rgba(0,159,77,0.1)] transition-all duration-500 relative overflow-hidden">
                     <div
                         class="absolute -right-4 -top-4 w-24 h-24 bg-bedas-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-0">
                     </div>
@@ -248,13 +262,18 @@
                         Dispensasi Nikah</h3>
                     <p class="text-slate-500 leading-relaxed text-lg">Pengurusan surat keterangan dispensasi nikah
                         dengan sistem validasi data yang cepat dan akurat.</p>
+                    <div class="mt-6 flex items-center gap-2 text-bedas-600 font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span>Lihat Persyaratan</span>
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
                 </div>
 
                 <!-- Card 2 -->
                 <div x-show="shown" x-transition:enter="transition ease-out duration-700 delay-[400ms]"
                     x-transition:enter-start="opacity-0 translate-y-10"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="group p-10 bg-slate-50 rounded-3xl border border-slate-100 hover:bg-white hover:border-bedas-200 hover:shadow-[0_20px_50px_rgba(0,159,77,0.1)] transition-all duration-500 relative overflow-hidden">
+                    @click="openService('rekomendasi')"
+                    class="cursor-pointer group p-10 bg-slate-50 rounded-3xl border border-slate-100 hover:bg-white hover:border-bedas-200 hover:shadow-[0_20px_50px_rgba(0,159,77,0.1)] transition-all duration-500 relative overflow-hidden">
                     <div
                         class="absolute -right-4 -top-4 w-24 h-24 bg-bedas-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-0">
                     </div>
@@ -266,13 +285,18 @@
                         Rekomendasi Bantuan</h3>
                     <p class="text-slate-500 leading-relaxed text-lg">Permohonan surat rekomendasi untuk berbagai
                         bantuan sosial dan program daerah tepat sasaran.</p>
+                    <div class="mt-6 flex items-center gap-2 text-bedas-600 font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span>Lihat Persyaratan</span>
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
                 </div>
 
                 <!-- Card 3 -->
                 <div x-show="shown" x-transition:enter="transition ease-out duration-700 delay-[600ms]"
                     x-transition:enter-start="opacity-0 translate-y-10"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="group p-10 bg-slate-50 rounded-3xl border border-slate-100 hover:bg-white hover:border-bedas-200 hover:shadow-[0_20px_50px_rgba(0,159,77,0.1)] transition-all duration-500 relative overflow-hidden">
+                    @click="openService('keramaian')"
+                    class="cursor-pointer group p-10 bg-slate-50 rounded-3xl border border-slate-100 hover:bg-white hover:border-bedas-200 hover:shadow-[0_20px_50px_rgba(0,159,77,0.1)] transition-all duration-500 relative overflow-hidden">
                     <div
                         class="absolute -right-4 -top-4 w-24 h-24 bg-bedas-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-0">
                     </div>
@@ -284,7 +308,481 @@
                         Keramaian</h3>
                     <p class="text-slate-500 leading-relaxed text-lg">Urus perizinan untuk acara keramaian di lingkungan
                         masyarakat dengan sistem pelaporan terpadu.</p>
+                    <div class="mt-6 flex items-center gap-2 text-bedas-600 font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span>Lihat Persyaratan</span>
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
                 </div>
+
+                <!-- Service Detail Modal -->
+                <div x-show="showServiceDetail" class="fixed inset-0 z-[150] overflow-y-auto" style="display: none;" x-cloak>
+                    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                        <!-- Backdrop -->
+                        <div x-show="showServiceDetail" x-transition:enter="ease-out duration-300"
+                            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                            x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                            x-transition:leave-end="opacity-0" @click="closeService()"
+                            class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-md"></div>
+
+                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+
+                        <!-- Modal Content -->
+                        <div x-show="showServiceDetail" x-transition:enter="ease-out duration-300"
+                            x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave="ease-in duration-200"
+                            x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                            x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                            class="inline-block w-full max-w-3xl overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-[32px] sm:my-8">
+
+                            <!-- Modal Header -->
+                            <div class="relative px-8 sm:px-10 pt-8 pb-6 border-b border-slate-100">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-sm"
+                                            :class="{
+                                                'bg-blue-50': activeService === 'dispen',
+                                                'bg-emerald-50': activeService === 'rekomendasi',
+                                                'bg-violet-50': activeService === 'keramaian'
+                                            }">
+                                            <span x-text="activeService === 'dispen' ? '💍' : (activeService === 'rekomendasi' ? '🤝' : '🎉')"></span>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-2xl font-display font-bold text-slate-900"
+                                                x-text="activeService === 'dispen' ? 'Dispensasi Nikah' : (activeService === 'rekomendasi' ? 'Rekomendasi Bantuan' : 'Izin Keramaian')"></h2>
+                                            <p class="text-slate-500 text-sm mt-1">Detail persyaratan permohonan</p>
+                                        </div>
+                                    </div>
+                                    <button @click="closeService()"
+                                        class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all focus:outline-none">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Modal Body -->
+                            <div class="px-8 sm:px-10 py-8 overflow-y-auto max-h-[65vh] space-y-8">
+
+                                <!-- ======================== DISPEN NIKAH ======================== -->
+                                <template x-if="activeService === 'dispen'">
+                                    <div class="space-y-6">
+                                        <!-- Ringkasan -->
+                                        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-blue-900 text-sm">Tentang Layanan</h4>
+                                                    <p class="text-blue-700 text-sm mt-1 leading-relaxed">Pelayanan pengajuan surat dispensasi nikah untuk pasangan calon pengantin yang memerlukan surat keterangan dari kecamatan.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Data yang Perlu Diisi -->
+                                        <div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                <span class="w-7 h-7 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-xs">📝</span>
+                                                Data yang Perlu Diisi
+                                            </h3>
+                                            <div class="space-y-4">
+                                                <!-- Calon Suami -->
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-blue-100 text-blue-600 rounded-md flex items-center justify-center text-xs">👨</span>
+                                                        Data Calon Suami
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Nama Lengkap
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            NIK
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Bin
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            TTL
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Agama
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Pekerjaan
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Status
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Alamat
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <!-- Calon Istri -->
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-pink-100 text-pink-600 rounded-md flex items-center justify-center text-xs">👩</span>
+                                                        Data Calon Istri
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Nama Lengkap
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            NIK
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Binti
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            TTL
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Agama
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Pekerjaan
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Status
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Alamat
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <!-- Rencana Pernikahan -->
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-purple-100 text-purple-600 rounded-md flex items-center justify-center text-xs">📅</span>
+                                                        Rencana Pernikahan
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Hari
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Tanggal
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Waktu
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Tempat Akad
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <!-- Lainnya -->
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-green-100 text-green-600 rounded-md flex items-center justify-center text-xs">📝</span>
+                                                        Lainnya
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Alasan Pengajuan
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Nomor WhatsApp
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Berkas Persyaratan -->
+                                        <div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                <span class="w-7 h-7 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-xs">📂</span>
+                                                Berkas Persyaratan (Wajib Upload)
+                                            </h3>
+                                            <div class="bg-slate-50 rounded-xl border border-slate-100 divide-y divide-slate-100">
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                                                    <span class="text-sm text-slate-700 font-medium">KTP Calon Istri</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                                                    <span class="text-sm text-slate-700 font-medium">KTP Calon Suami</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                                                    <span class="text-sm text-slate-700 font-medium">KK Calon Istri</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                                                    <span class="text-sm text-slate-700 font-medium">KK Calon Suami</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
+                                                    <span class="text-sm text-slate-700 font-medium">Pas Foto Latar Biru</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">6</span>
+                                                    <span class="text-sm text-slate-700 font-medium">N1 (Desa Calon Istri)</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">7</span>
+                                                    <span class="text-sm text-slate-700 font-medium">N1 (Desa/Kecamatan Calon Suami - Jika Beda)</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">8</span>
+                                                    <span class="text-sm text-slate-700 font-medium">N2 Permohonan Kehendak Nikah</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">9</span>
+                                                    <span class="text-sm text-slate-700 font-medium">N4 Persetujuan Pengantin</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">10</span>
+                                                    <span class="text-sm text-slate-700 font-medium">N10 Rekomendasi KUA</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Format file yang diterima: PDF atau Gambar (JPG, PNG)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- ======================== REKOMENDASI BANTUAN ======================== -->
+                                <template x-if="activeService === 'rekomendasi'">
+                                    <div class="space-y-6">
+                                        <!-- Ringkasan -->
+                                        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-emerald-900 text-sm">Tentang Layanan</h4>
+                                                    <p class="text-emerald-700 text-sm mt-1 leading-relaxed">Pelayanan surat rekomendasi untuk pengajuan berbagai bantuan sosial dan program daerah bagi kelompok masyarakat.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Data yang Perlu Diisi -->
+                                        <div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                <span class="w-7 h-7 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-xs">📝</span>
+                                                Data yang Perlu Diisi
+                                            </h3>
+                                            <div class="space-y-4">
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-md flex items-center justify-center text-xs">📋</span>
+                                                        Data Rekomendasi Bantuan
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Jenis Kelompok
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Nama Kelompok
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Alamat Lengkap
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Perihal
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Nama Desa
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Berkas Persyaratan -->
+                                        <div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                <span class="w-7 h-7 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-xs">📂</span>
+                                                Berkas Persyaratan (Wajib Upload)
+                                            </h3>
+                                            <div class="bg-slate-50 rounded-xl border border-slate-100 divide-y divide-slate-100">
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-emerald-100 text-emerald-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                                                    <span class="text-sm text-slate-700 font-medium">Proposal Bantuan</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Format file yang diterima: PDF atau Gambar (JPG, PNG)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- ======================== IZIN KERAMAIAN ======================== -->
+                                <template x-if="activeService === 'keramaian'">
+                                    <div class="space-y-6">
+                                        <!-- Ringkasan -->
+                                        <div class="bg-violet-50 border border-violet-100 rounded-2xl p-5">
+                                            <div class="flex items-start gap-3">
+                                                <div class="w-8 h-8 bg-violet-100 text-violet-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-bold text-violet-900 text-sm">Tentang Layanan</h4>
+                                                    <p class="text-violet-700 text-sm mt-1 leading-relaxed">Pelayanan perizinan untuk mengadakan acara keramaian di lingkungan masyarakat dengan sistem pelaporan terpadu.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Data yang Perlu Diisi -->
+                                        <div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                <span class="w-7 h-7 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-xs">📝</span>
+                                                Data yang Perlu Diisi
+                                            </h3>
+                                            <div class="space-y-4">
+                                                <!-- Data Pemohon -->
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-blue-100 text-blue-600 rounded-md flex items-center justify-center text-xs">👤</span>
+                                                        Data Pemohon
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Nama Lengkap
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            NIK
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Tempat, Tanggal Lahir
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Jenis Kelamin
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Pekerjaan
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Alamat
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <!-- Detail Keramaian -->
+                                                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                                                    <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                                                        <span class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-md flex items-center justify-center text-xs">🎉</span>
+                                                        Maksud Mengadakan Keramaian
+                                                    </h4>
+                                                    <div class="grid grid-cols-2 gap-2">
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Hari / Tanggal
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Acara
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Lokasi
+                                                        </span>
+                                                        <span class="inline-flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 font-medium">
+                                                            <svg class="w-3 h-3 text-bedas-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                                            Hiburan
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Berkas Persyaratan -->
+                                        <div>
+                                            <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                <span class="w-7 h-7 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-xs">📂</span>
+                                                Berkas Persyaratan (Wajib Upload)
+                                            </h3>
+                                            <div class="bg-slate-50 rounded-xl border border-slate-100 divide-y divide-slate-100">
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                                                    <span class="text-sm text-slate-700 font-medium">KTP Pemohon</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 px-5 py-3.5">
+                                                    <span class="w-7 h-7 bg-violet-100 text-violet-700 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                                                    <span class="text-sm text-slate-700 font-medium">Proposal Acara</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-xs text-slate-400 mt-3 flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                Format file yang diterima: PDF atau Gambar (JPG, PNG)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="px-8 sm:px-10 py-5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <p class="text-xs text-slate-400 flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-bedas-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Silakan register/login untuk mengajukan permohonan
+                                </p>
+                                <div class="flex items-center gap-3">
+                                    <button @click="closeService()"
+                                        class="px-6 py-2.5 bg-white text-slate-700 font-bold rounded-xl border border-slate-200 hover:bg-slate-100 transition-all text-sm active:scale-95">
+                                        Tutup
+                                    </button>
+                                    @auth
+                                        <a href="{{ url('/dashboard') }}"
+                                            class="px-6 py-2.5 bg-bedas-600 text-white font-bold rounded-xl hover:bg-bedas-700 transition-all text-sm shadow-lg shadow-bedas-200 active:scale-95">
+                                            Ajukan Sekarang
+                                        </a>
+                                    @else
+                                        <button @click="closeService(); showRegister = true;"
+                                            class="px-6 py-2.5 bg-bedas-600 text-white font-bold rounded-xl hover:bg-bedas-700 transition-all text-sm shadow-lg shadow-bedas-200 active:scale-95">
+                                            Daftar & Ajukan
+                                        </button>
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
