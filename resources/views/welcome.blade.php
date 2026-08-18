@@ -1319,9 +1319,45 @@
                     regPassword: '',
                     regPasswordConfirm: '',
                     
-                    isEmailValid(email) {
-                        if (!email) return null;
-                        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+                    getEmailStatus(email) {
+                        if (!email || email.length === 0) return { valid: false, message: '', type: 'empty' };
+                        const atIndex = email.indexOf('@');
+                        const username = atIndex === -1 ? email : email.substring(0, atIndex);
+                        
+                        if (username.length < 6) {
+                            return { 
+                                valid: false, 
+                                message: 'Karakter sebelum \'@\' minimal 6 karakter (saat ini: ' + username.length + ' karakter)', 
+                                type: 'too_short' 
+                            };
+                        }
+                        if (username.length > 30) {
+                            return { 
+                                valid: false, 
+                                message: 'Karakter sebelum \'@\' maksimal 30 karakter (saat ini: ' + username.length + ' karakter)', 
+                                type: 'too_long' 
+                            };
+                        }
+                        if (atIndex === -1 || !email.includes('.')) {
+                            return { 
+                                valid: false, 
+                                message: 'Lengkapi alamat email dengan simbol @ dan domain (contoh: ' + (username || 'nama') + '@gmail.com)', 
+                                type: 'incomplete' 
+                            };
+                        }
+                        const emailPattern = /^[a-zA-Z0-9._%+-]{6,30}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                        if (!emailPattern.test(email)) {
+                            return { 
+                                valid: false, 
+                                message: 'Format domain email tidak valid (contoh: nama@domain.com)', 
+                                type: 'invalid' 
+                            };
+                        }
+                        return { 
+                            valid: true, 
+                            message: 'Format email valid (' + username.length + ' karakter sebelum @)', 
+                            type: 'valid' 
+                        };
                     },
                     isPhoneValid(phone) {
                         if (!phone) return null;
@@ -1359,29 +1395,29 @@
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Alamat Email <span class="text-red-500">*</span></label>
-                            <span class="text-[11px] text-slate-400">Format: nama@domain.com</span>
+                            <span class="text-[11px] text-slate-500 font-medium">Min. 6–30 karakter sebelum @</span>
                         </div>
                         <input type="email" name="email" x-model="regEmail" required
                             class="w-full px-4 py-2.5 rounded-xl border text-sm transition-all outline-none"
-                            :class="regEmail.length > 0 ? (isEmailValid(regEmail) ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-amber-400 bg-amber-50/30 focus:ring-4 focus:ring-amber-100 focus:border-amber-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
-                            placeholder="nama@email.com">
+                            :class="regEmail.length > 0 ? (getEmailStatus(regEmail).valid ? 'border-emerald-400 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500' : 'border-amber-400 bg-amber-50/30 focus:ring-4 focus:ring-amber-100 focus:border-amber-500') : 'border-slate-200 focus:ring-4 focus:ring-bedas-100 focus:border-bedas-500'"
+                            placeholder="contoh: namauser@email.com">
                         
                         <!-- Real-time Email Format Feedback -->
                         <div class="mt-1">
-                            <template x-if="regEmail.length > 0 && isEmailValid(regEmail)">
+                            <template x-if="regEmail.length > 0 && getEmailStatus(regEmail).valid">
                                 <p class="text-[11px] text-emerald-600 flex items-center gap-1 font-medium">
                                     <svg class="w-3.5 h-3.5 flex-shrink-0 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                                    Format email valid
+                                    <span x-text="getEmailStatus(regEmail).message"></span>
                                 </p>
                             </template>
-                            <template x-if="regEmail.length > 0 && !isEmailValid(regEmail)">
+                            <template x-if="regEmail.length > 0 && !getEmailStatus(regEmail).valid">
                                 <p class="text-[11px] text-amber-600 flex items-center gap-1 font-medium">
                                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Format email harus lengkap dengan simbol @ dan domain (contoh: budi@gmail.com)
+                                    <span x-text="getEmailStatus(regEmail).message"></span>
                                 </p>
                             </template>
                             <template x-if="!regEmail || regEmail.length === 0">
-                                <p class="text-[11px] text-slate-400">Gunakan email aktif (Gmail, Yahoo, Outlook, dll) untuk masuk ke akun</p>
+                                <p class="text-[11px] text-slate-400">Nama email sebelum '@' harus 6–30 karakter (contoh: ahmad123@gmail.com)</p>
                             </template>
                         </div>
                         @if ($errors->has('email') && !$errors->has('password'))

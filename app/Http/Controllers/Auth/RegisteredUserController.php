@@ -32,7 +32,22 @@ class RegisteredUserController extends Controller
     {
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s\.\',]+$/'],
-            'email' => ['required', 'string', 'lowercase', 'email:rfc', 'max:255', 'unique:'.User::class],
+            'email' => [
+                'required', 
+                'string', 
+                'lowercase', 
+                'email:rfc', 
+                'max:255', 
+                'unique:'.User::class,
+                function ($attribute, $value, $fail) {
+                    $parts = explode('@', $value);
+                    $username = $parts[0] ?? '';
+                    $length = strlen($username);
+                    if ($length < 6 || $length > 30) {
+                        $fail('Nama email sebelum tanda \'@\' harus antara 6 sampai 30 karakter (saat ini: '.$length.' karakter).');
+                    }
+                },
+            ],
             'phone' => ['required', 'string', 'max:15', 'regex:/^(08|628)[0-9]{8,13}$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [

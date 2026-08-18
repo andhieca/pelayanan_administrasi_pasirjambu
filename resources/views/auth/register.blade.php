@@ -23,11 +23,11 @@
         <div class="mt-4">
             <div class="flex items-center justify-between">
                 <x-input-label for="email" value="Alamat Email *" />
-                <span class="text-xs text-slate-400">Format: nama@domain.com</span>
+                <span class="text-xs text-slate-500 font-medium">Min. 6–30 karakter sebelum @</span>
             </div>
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required
-                autocomplete="username" placeholder="nama@email.com" />
-            <p class="mt-1 text-xs text-slate-500">Gunakan email aktif yang valid (contoh: user@gmail.com, budi@yahoo.com)</p>
+                autocomplete="username" placeholder="contoh: namauser@email.com" />
+            <p class="mt-1 text-xs text-slate-500">Nama email sebelum '@' harus 6–30 karakter (contoh: ahmad123@gmail.com)</p>
             <x-input-error :messages="$errors->get('email')" class="mt-1.5" />
         </div>
 
