@@ -53,6 +53,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get permohonans submitted by the user.
+     */
+    public function permohonans(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Permohonan::class);
+    }
+
+    /**
      * Send the password reset notification.
      */
     public function sendPasswordResetNotification($token): void
