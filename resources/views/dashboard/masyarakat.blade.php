@@ -1091,8 +1091,20 @@
                                                 </div>
                                                 <div>
                                                     <label class="block text-slate-700 text-xs font-bold mb-1 uppercase">Nama Desa</label>
-                                                    <input type="text" name="rekomendasi[nama_desa]" x-model="rekomendasi.nama_desa" @input="rekomendasi.nama_desa = sanitizeNamaDesa($event.target.value); emptyFields['rekomendasi.nama_desa'] = null" maxlength="100" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.nama_desa']}" placeholder="Nama Desa">
-                                                    <p class="text-xs mt-1" :class="formSubmitted && emptyFields['rekomendasi.nama_desa'] ? 'text-red-500 validation-warning' : 'text-slate-400'" x-text="formSubmitted && emptyFields['rekomendasi.nama_desa'] ? emptyFields['rekomendasi.nama_desa'] : 'Hanya huruf dan spasi'"></p>
+                                                    <select name="rekomendasi[nama_desa]" x-model="rekomendasi.nama_desa" @change="emptyFields['rekomendasi.nama_desa'] = null" class="w-full border-slate-300 rounded-lg focus:ring-bedas-500 focus:border-bedas-500 text-sm" :class="{'border-red-500 ring-1 ring-red-500': formSubmitted && emptyFields['rekomendasi.nama_desa']}">
+                                                        <option value="">-- Pilih Desa --</option>
+                                                        <option value="Cibodas">Cibodas</option>
+                                                        <option value="Cikoneng">Cikoneng</option>
+                                                        <option value="Cisondari">Cisondari</option>
+                                                        <option value="Cukanggenteng">Cukanggenteng</option>
+                                                        <option value="Margamulya">Margamulya</option>
+                                                        <option value="Mekarmaju">Mekarmaju</option>
+                                                        <option value="Mekarsari">Mekarsari</option>
+                                                        <option value="Pasirjambu">Pasirjambu</option>
+                                                        <option value="Sugihmukti">Sugihmukti</option>
+                                                        <option value="Tenjolaya">Tenjolaya</option>
+                                                    </select>
+                                                    <p x-show="formSubmitted && emptyFields['rekomendasi.nama_desa']" class="text-xs text-red-500 mt-1 validation-warning" x-text="emptyFields['rekomendasi.nama_desa']"></p>
                                                 </div>
                                             </div>
                                         </div>

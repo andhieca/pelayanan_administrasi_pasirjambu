@@ -135,7 +135,7 @@ class MasyarakatController extends Controller
                 'rekomendasi.nama_kelompok' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z0-9\s\.\-]+$/'],
                 'rekomendasi.alamat' => 'required|string|max:500',
                 'rekomendasi.perihal' => 'required|string|max:500',
-                'rekomendasi.nama_desa' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s]+$/'],
+                'rekomendasi.nama_desa' => ['required', 'string', 'in:Cibodas,Cikoneng,Cisondari,Cukanggenteng,Margamulya,Mekarmaju,Mekarsari,Pasirjambu,Sugihmukti,Tenjolaya'],
                 'files.proposal' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             ], [
                 'rekomendasi.jenis_kelompok.regex' => 'Jenis kelompok hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
@@ -144,8 +144,7 @@ class MasyarakatController extends Controller
                 'rekomendasi.nama_kelompok.max' => 'Nama kelompok maksimal 200 karakter.',
                 'rekomendasi.alamat.max' => 'Alamat maksimal 500 karakter.',
                 'rekomendasi.perihal.max' => 'Perihal maksimal 500 karakter.',
-                'rekomendasi.nama_desa.regex' => 'Nama desa hanya boleh mengandung huruf dan spasi.',
-                'rekomendasi.nama_desa.max' => 'Nama desa maksimal 100 karakter.',
+                'rekomendasi.nama_desa.in' => 'Nama desa yang dipilih tidak valid.',
             ]);
         }
 
@@ -297,12 +296,12 @@ class MasyarakatController extends Controller
                 'rekomendasi.nama_kelompok' => ['required', 'string', 'max:200', 'regex:/^[a-zA-Z0-9\s\.\-]+$/'],
                 'rekomendasi.alamat' => 'required|string|max:500',
                 'rekomendasi.perihal' => 'required|string|max:500',
-                'rekomendasi.nama_desa' => ['required', 'string', 'max:100', 'regex:/^[a-zA-Z\s]+$/'],
+                'rekomendasi.nama_desa' => ['required', 'string', 'in:Cibodas,Cikoneng,Cisondari,Cukanggenteng,Margamulya,Mekarmaju,Mekarsari,Pasirjambu,Sugihmukti,Tenjolaya'],
                 'files.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             ], [
                 'rekomendasi.jenis_kelompok.regex' => 'Jenis kelompok hanya boleh mengandung huruf, spasi, garis miring, dan strip.',
                 'rekomendasi.nama_kelompok.regex' => 'Nama kelompok hanya boleh mengandung huruf, angka, spasi, titik, dan strip.',
-                'rekomendasi.nama_desa.regex' => 'Nama desa hanya boleh mengandung huruf dan spasi.',
+                'rekomendasi.nama_desa.in' => 'Nama desa yang dipilih tidak valid.',
             ]);
         }
 
