@@ -1,13 +1,14 @@
 <nav x-data="{ open: false }" class="bg-white/80 backdrop-blur-md border-b border-gray-100 fixed w-full top-0 z-50">
     <!-- Primary Navigation Menu -->
-    <div class="px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
+    <div class="px-3 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16 gap-2">
+            <!-- Left Side: Hamburger & Brand -->
+            <div class="flex items-center min-w-0 flex-shrink-0">
                 <!-- Hamburger (Mobile) -->
-                <div class="-me-2 flex items-center sm:hidden mr-4">
+                <div class="flex items-center sm:hidden mr-1.5 flex-shrink-0">
                     <button @click="open = ! open"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        class="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
+                        <svg class="h-5 w-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                             <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex"
                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -21,13 +22,13 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}"
-                        class="flex items-center gap-3 group transition-all duration-300">
-                        <div class="relative">
+                        class="flex items-center gap-2.5 group transition-all duration-300">
+                        <div class="relative flex-shrink-0">
                             <div
                                 class="absolute -inset-1 bg-gradient-to-tr from-bedas-500 to-emerald-500 rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-300">
                             </div>
                             <img src="{{ asset('logo-kab-bandung.png') }}" alt="Logo"
-                                class="relative w-10 h-auto drop-shadow-sm">
+                                class="relative w-8 sm:w-10 h-auto drop-shadow-sm">
                         </div>
                         <div class="flex flex-col leading-tight hidden sm:flex">
                             <span class="text-[10px] font-bold text-bedas-600 uppercase tracking-widest">Pelayanan
@@ -38,8 +39,8 @@
                 </div>
             </div>
 
-            <!-- Settings Dropdown & Notifications -->
-            <div class="flex items-center sm:ms-6">
+            <!-- Right Side: Settings Dropdown & Notifications -->
+            <div class="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                 @php
                     $userNotifications = Auth::check() 
                         ? Auth::user()->permohonans()
@@ -52,9 +53,9 @@
                 @endphp
 
                 <!-- Notification Bell Dropdown -->
-                <div class="relative mr-2" x-data="{ notifOpen: false }" @click.outside="notifOpen = false">
+                <div class="relative" x-data="{ notifOpen: false }" @click.outside="notifOpen = false">
                     <button @click="notifOpen = !notifOpen"
-                        class="relative p-2.5 rounded-xl text-slate-600 bg-slate-50 hover:bg-slate-100 hover:text-bedas-600 focus:outline-none transition-all duration-200"
+                        class="relative p-2 sm:p-2.5 rounded-xl text-slate-600 bg-slate-50 hover:bg-slate-100 hover:text-bedas-600 focus:outline-none transition-all duration-200"
                         title="Notifikasi">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -70,7 +71,7 @@
                         @endif
                     </button>
 
-                    <!-- Dropdown Panel -->
+                    <!-- Dropdown Panel (Responsive: fixed on mobile, absolute on desktop) -->
                     <div x-show="notifOpen"
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
@@ -78,11 +79,11 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                         x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-                        class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 divide-y divide-slate-100"
+                        class="fixed sm:absolute inset-x-3 sm:inset-x-auto sm:right-0 top-[68px] sm:top-auto sm:mt-2 w-auto sm:w-96 max-h-[80vh] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50 divide-y divide-slate-100"
                         style="display: none;">
                         
                         <!-- Header -->
-                        <div class="p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
+                        <div class="p-3.5 sm:p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <svg class="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
@@ -95,14 +96,14 @@
                         </div>
 
                         <!-- Notification List -->
-                        <div class="max-h-[360px] overflow-y-auto divide-y divide-slate-100">
+                        <div class="max-h-[320px] overflow-y-auto divide-y divide-slate-100">
                             @forelse($userNotifications as $item)
-                                <div class="p-4 hover:bg-slate-50 transition-colors relative group">
+                                <div class="p-3.5 sm:p-4 hover:bg-slate-50 transition-colors relative group">
                                     @if($item->status === 'selesai')
                                         <!-- Status Selesai -->
                                         <div class="flex items-start gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center justify-between gap-1 mb-1">
@@ -130,8 +131,8 @@
                                     @elseif($item->status === 'ditolak')
                                         <!-- Status Ditolak / Perlu Perbaikan -->
                                         <div class="flex items-start gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                             </div>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center justify-between gap-1 mb-1">
@@ -178,15 +179,16 @@
                     </div>
                 </div>
 
+                <!-- User Profile Dropdown -->
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-bold rounded-xl text-slate-600 bg-slate-50 hover:bg-slate-100 focus:outline-none transition ease-in-out duration-150">
-                            <div class="mr-2">{{ Auth::user()->name }}</div>
+                            class="inline-flex items-center px-2 sm:px-3 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm leading-4 font-bold rounded-xl text-slate-700 bg-slate-50 hover:bg-slate-100 focus:outline-none transition ease-in-out duration-150 max-w-[125px] sm:max-w-[200px]">
+                            <div class="truncate mr-1 sm:mr-2 text-xs sm:text-sm">{{ Auth::user()->name }}</div>
                             <span
-                                class="px-2 py-0.5 bg-bedas-100 text-bedas-700 text-[10px] rounded-full uppercase mr-2">{{ Auth::user()->role }}</span>
+                                class="hidden md:inline-block px-2 py-0.5 bg-bedas-100 text-bedas-700 text-[10px] rounded-full uppercase mr-1.5 flex-shrink-0">{{ Auth::user()->role }}</span>
 
-                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <svg class="fill-current h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
                                     d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                     clip-rule="evenodd" />
