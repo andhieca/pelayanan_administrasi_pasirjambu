@@ -68,7 +68,11 @@ class PetugasController extends Controller
                 'action' => 'rejected',
                 'actor_id' => Auth::id(),
             ]);
-            return redirect()->back()->with('success', 'Permohonan ditolak.');
+
+            // Kirim notifikasi WhatsApp penolakan/perbaikan ke masyarakat
+            $this->sendWhatsAppRejectionNotification($permohonan);
+
+            return redirect()->back()->with('success', 'Permohonan ditolak dan notifikasi WhatsApp telah dikirimkan ke pemohon.');
         } else {
             // Approve / Ajukan ke Camat (tanpa nomor surat)
             $permohonan->update([
@@ -116,7 +120,7 @@ class PetugasController extends Controller
     }
 
     /**
-     * Send WhatsApp notification to masyarakat via Fonnte.
+     * Send WhatsApp notification to masyarakat via Fonnte when permohonan is completed.
      */
     protected function sendWhatsAppNotification(Permohonan $permohonan): void
     {
@@ -137,10 +141,49 @@ class PetugasController extends Controller
         $nomorSurat = $permohonan->nomor_surat;
 
         $message = "Assalamu'alaikum {$nama},\n\n"
-            . "Surat *{$jenisLayanan}* Anda telah selesai diproses.\n\n"
+            . "Kabar baik! Permohonan surat *{$jenisLayanan}* Anda telah *SELESAI* diproses dan ditandatangani.\n\n"
             . "📄 Nomor Surat: *{$nomorSurat}*\n"
-            . "📋 Jenis: {$jenisLayanan}\n\n"
-            . "Surat Anda telah selesai, untuk mendownloadnya silakan login ke akun Anda masing-masing di website Pelayanan Administrasi Kecamatan Pasirjambu.\n\n"
+            . "📋 Jenis Layanan: {$jenisLayanan}\n\n"
+            . "Surat Anda telah siap. Silakan login ke akun Anda di website Pelayanan Administrasi Kecamatan Pasirjambu untuk mengunduh/mencetak dokumen resmi Anda.\n\n"
+            . "Terima kasih.\n"
+            . "— Pelayanan Administrasi Kecamatan Pasirjambu";
+
+        $fonnte = new FonnteService();
+        $fonnte->sendMessage($phone, $message);
+    }
+
+    /**
+     * Send WhatsApp notification to masyarakat via Fonnte when permohonan is rejected / needs revision.
+     */
+    protected function sendWhatsAppRejectionNotification(Permohonan $permohonan): void
+    {
+        // Get phone number: prioritize metadata.whatsapp, fallback to user.phone
+        $phone = $permohonan->metadata['whatsapp'] ?? null;
+
+        if (empty($phone)) {
+            $permohonan->loadMissing('user');
+            $phone = $permohonan->user->phone ?? null;
+        }
+
+        if (empty($phone)) {
+            return; // No phone number available, skip notification
+        }
+
+        $nama = $permohonan->user->name ?? 'Bapak/Ibu';
+        $jenisLayanan = $permohonan->jenis_layanan;
+        $keterangan = $permohonan->keterangan ?: 'Terdapat berkas atau data yang perlu diperbaiki sesuai ketentuan.';
+
+        $invalidText = '';
+        if (!empty($permohonan->invalid_items) && is_array($permohonan->invalid_items)) {
+            $invalidText = "\n📌 *Item yang Perlu Diperbaiki:*\n- " . implode("\n- ", $permohonan->invalid_items) . "\n";
+        }
+
+        $message = "Assalamu'alaikum {$nama},\n\n"
+            . "Pemberitahuan: Permohonan surat *{$jenisLayanan}* Anda *MEMERLUKAN PERBAIKAN* / belum dapat disetujui.\n\n"
+            . "📋 Jenis Layanan: {$jenisLayanan}\n"
+            . "📝 Catatan Petugas: {$keterangan}\n"
+            . $invalidText . "\n"
+            . "Silakan login ke akun Anda di website Pelayanan Administrasi Kecamatan Pasirjambu, buka menu 'Riwayat Permohonan' dan klik tombol 'Ubah' untuk memperbaiki data/berkas yang ditandai.\n\n"
             . "Terima kasih.\n"
             . "— Pelayanan Administrasi Kecamatan Pasirjambu";
 
