@@ -464,8 +464,10 @@ class MasyarakatController extends Controller
             ->where('status', 'selesai')
             ->firstOrFail();
 
+        // Tandai notifikasi permohonan selesai sudah dibaca saat cetak surat dibuka
+        $permohonan->markNotifAsRead();
+
         // Fetch the Camat user (assuming there's only one active Camat or just taking the first one)
-        // Ideally we might want to store who approved it, but fetching the current role:camat user is sufficient for now.
         $camat = \App\Models\User::where('role', 'camat')->first();
 
         if (!$camat) {
@@ -481,5 +483,35 @@ class MasyarakatController extends Controller
         }
 
         return redirect()->back()->with('error', 'Cetak belum tersedia untuk layanan ini.');
+    }
+
+    /**
+     * Mark a specific notification as read.
+     */
+    public function markNotifRead($id)
+    {
+        $permohonan = Permohonan::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $permohonan->markNotifAsRead();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Mark all notifications as read for current user.
+     */
+    public function markAllNotifRead()
+    {
+        $permohonans = Permohonan::where('user_id', Auth::id())
+            ->whereIn('status', ['selesai', 'ditolak'])
+            ->get();
+
+        foreach ($permohonans as $p) {
+            $p->markNotifAsRead();
+        }
+
+        return response()->json(['success' => true]);
     }
 }

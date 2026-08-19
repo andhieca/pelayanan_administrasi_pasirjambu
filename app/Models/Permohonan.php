@@ -52,4 +52,26 @@ class Permohonan extends Model
 
         return $todayPrefix . str_pad((string)$nextSequence, 3, '0', STR_PAD_LEFT);
     }
+
+    public function isNotifRead(): bool
+    {
+        return !empty($this->notif_read_at) || !empty($this->metadata['notif_read_at']);
+    }
+
+    public function markNotifAsRead(): void
+    {
+        $meta = $this->metadata ?? [];
+        $meta['notif_read_at'] = now()->toISOString();
+        
+        $updates = ['metadata' => $meta];
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasColumn('permohonans', 'notif_read_at')) {
+                $updates['notif_read_at'] = now();
+            }
+        } catch (\Exception $e) {
+            // Ignore schema check error if offline
+        }
+
+        $this->update($updates);
+    }
 }

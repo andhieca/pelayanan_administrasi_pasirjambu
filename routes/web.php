@@ -181,6 +181,8 @@ Route::middleware(['auth', 'role:masyarakat'])->group(function () {
     Route::put('/masyarakat/permohonan/{id}', [MasyarakatController::class, 'update'])->name('masyarakat.update');
     Route::delete('/masyarakat/permohonan/{id}', [MasyarakatController::class, 'destroy'])->name('masyarakat.destroy');
     Route::get('/masyarakat/print/{id}', [MasyarakatController::class, 'print'])->name('masyarakat.print');
+    Route::post('/masyarakat/permohonan/{id}/mark-read', [MasyarakatController::class, 'markNotifRead'])->name('masyarakat.notif.markRead');
+    Route::post('/masyarakat/permohonan/mark-all-read', [MasyarakatController::class, 'markAllNotifRead'])->name('masyarakat.notif.markAll');
 });
 
 Route::middleware(['auth', 'role:petugas'])->group(function () {

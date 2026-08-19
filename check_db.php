@@ -3,13 +3,14 @@ require __DIR__ . '/vendor/autoload.php';
 $app = require_once __DIR__ . '/bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
-$p = App\Models\Permohonan::where('status', 'ditolak')->latest()->first();
-if ($p) {
-    echo 'ID: ' . $p->id . PHP_EOL;
-    echo 'Status: ' . $p->status . PHP_EOL;
-    echo 'Invalid Items (cast): ' . json_encode($p->invalid_items) . PHP_EOL;
-    echo 'Invalid Items (raw): ' . $p->getRawOriginal('invalid_items') . PHP_EOL;
-    echo 'Keterangan: ' . $p->keterangan . PHP_EOL;
+\Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+echo \Illuminate\Support\Facades\Artisan::output() . PHP_EOL;
+
+if (!\Illuminate\Support\Facades\Schema::hasColumn('permohonans', 'notif_read_at')) {
+    \Illuminate\Support\Facades\Schema::table('permohonans', function (\Illuminate\Database\Schema\Blueprint $table) {
+        $table->timestamp('notif_read_at')->nullable()->after('keterangan');
+    });
+    echo "Column added manually." . PHP_EOL;
 } else {
-    echo 'No rejected permohonan found' . PHP_EOL;
+    echo "Column notif_read_at exists!" . PHP_EOL;
 }
